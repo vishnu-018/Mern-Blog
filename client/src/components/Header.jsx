@@ -66,13 +66,18 @@ export default function Header() {
 
         {/* Sign In Button */}
         <Link to="/sign-in">
-          <Button
-            className="py-2 px-6 text-white font-semibold rounded-lg bg-gradient-to-r from-purple-500 via-blue-500 to-blue-600 hover:from-purple-600 hover:via-blue-600 hover:to-blue-700"
-            pill
-          >
-            Sign In
-          </Button>
-        </Link>
+  <Button
+    className="py-2 px-6 text-blue-500 font-semibold rounded-lg border-2 border-blue-500 bg-transparent hover:bg-blue-600 hover:text-white focus:bg-blue-600 focus:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+    pill
+  >
+    Sign In
+  </Button>
+</Link>
+
+
+
+
+
       </div>
 
       {/* Dropdown Menu for Small Screens */}
