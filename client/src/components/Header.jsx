@@ -55,8 +55,8 @@ export default function Header() {
             <Link
               key={index}
               to={path}
-              className={`text-gray-900 dark:text-white hover:underline ${
-                isActive(path) ? "font-bold text-blue-500" : ""
+              className={`font-bold hover:underline ${
+                isActive(path) ? "text-blue-500" : "text-gray-900 dark:text-white"
               }`}
             >
               {path === "/" ? "Home" : path.substring(1).charAt(0).toUpperCase() + path.slice(2)}
@@ -67,13 +67,12 @@ export default function Header() {
         {/* Sign In Button */}
         <Link to="/sign-in">
   <Button
-    className="py-2 px-6 text-blue-500 font-semibold rounded-lg border-2 border-blue-500 bg-transparent hover:bg-blue-600 hover:text-white focus:bg-blue-600 focus:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+    className="py-2 px-6 text-blue-500 font-semibold rounded-lg bg-transparent hover:bg-blue-600 hover:text-white focus:bg-blue-600 focus:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 border-2 border-transparent border-gradient-to-r from-purple-500 to-blue-500"
     pill
   >
     Sign In
   </Button>
 </Link>
-
 
 
 
@@ -87,8 +86,8 @@ export default function Header() {
             <Link
               key={index}
               to={path}
-              className={`text-gray-900 dark:text-white hover:underline ${
-                isActive(path) ? "font-bold text-blue-500" : ""
+              className={`font-bold hover:underline ${
+                isActive(path) ? "text-blue-500" : "text-gray-900 dark:text-white"
               }`}
             >
               {path === "/" ? "Home" : path.substring(1).charAt(0).toUpperCase() + path.slice(2)}
