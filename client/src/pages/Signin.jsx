@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link,useNavigate } from "react-router-dom";
 import { useDispatch ,useSelector} from "react-redux";
 import { signInSuccess,signInStart,signInFailure } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 export default function SignIn() {
   const [formData, setformData] = useState({});
  const {loading,error:errorMessage}= useSelector(state=>state.user);
@@ -95,6 +96,7 @@ export default function SignIn() {
 }
 
             </Button>
+            <OAuth/>
           </form>
           {/* Corrected error message rendering */}
           {errorMessage && (
