@@ -51,7 +51,8 @@ export default function Header() {
           <Dropdown
             label={
               <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
-                <img src={currentUser.profilePicture} alt="user" className="w-full h-full object-cover" />
+                <img src={currentUser.profilePicture} alt="user" className="w-full h-full object-cover"
+                 />
               </div>
             }
             arrowIcon={false}
