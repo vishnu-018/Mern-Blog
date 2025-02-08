@@ -117,6 +117,10 @@ export default function DashProfile() {
       } else {
         dispatch(updateSuccess(data));
         setUpdateUserSuccess("User's profile updated successfully");
+
+        // Persist changes in localStorage
+        localStorage.setItem("profilePicture", data.profilePicture);
+        setImageFileUrl(data.profilePicture);
       }
       setProgress(100);
     } catch (error) {
@@ -132,9 +136,11 @@ export default function DashProfile() {
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
 
-      {error && <Alert color="failure">{error}</Alert>}
-      {updateUserError && <Alert color='failure' className='mt-5'>{updateUserError}</Alert>}
-      {updateUserSuccess && <Alert color='success' className='mt-5'>{updateUserSuccess}</Alert>}
+      <div className="w-full flex flex-col items-center">
+        {error && <Alert color="failure" className="w-full text-center">{error}</Alert>}
+        {updateUserError && <Alert color='failure' className='w-full text-center mt-5'>{updateUserError}</Alert>}
+        {updateUserSuccess && <Alert color='success' className='w-full text-center mt-5'>{updateUserSuccess}</Alert>}
+      </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input type="file" accept="image/*" onChange={handleImageChange} ref={filePickerRef} hidden />
@@ -160,9 +166,9 @@ export default function DashProfile() {
           />
         </div>
 
-        <TextInput type="text" id="username" placeholder="username" defaultValue={currentUser.username} onChange={handleChange} />
-        <TextInput type="email" id="email" placeholder="email" defaultValue={currentUser.email} onChange={handleChange} />
-        <TextInput type="password" id="password" placeholder="password" onChange={handleChange} />
+        <TextInput type="text" id="username" placeholder="Username" defaultValue={currentUser.username} onChange={handleChange} />
+        <TextInput type="email" id="email" placeholder="Email" defaultValue={currentUser.email} onChange={handleChange} />
+        <TextInput type="password" id="password" placeholder="New Password" onChange={handleChange} />
 
         <Button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-1 rounded-lg outline" disabled={loading}>
           {loading ? "Updating..." : "Update"}
