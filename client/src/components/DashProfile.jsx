@@ -1,7 +1,7 @@
 import { Alert, Button, Modal, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { updateStart, updateSuccess, updateFailure,deleteUserFailure,deleteUserStart,deleteUserSuccess } from '../redux/user/userSlice';
+import { updateStart, updateSuccess, updateFailure,deleteUserFailure,deleteUserStart,deleteUserSuccess ,signoutSuccess} from '../redux/user/userSlice';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import 'react-circular-progressbar/dist/styles.css';
@@ -154,7 +154,24 @@ export default function DashProfile() {
       dispatch(deleteUserFailure(error.message));
     }
   };
+  
 
+  
+  const handleSignout = async () => {
+    try {
+      const res = await fetch('/api/user/signout', {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        dispatch(signoutSuccess());
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
 
 
@@ -206,7 +223,7 @@ export default function DashProfile() {
   Delete Account
 </span>
 
-        <span className="cursor-pointer">Sign Out</span>
+        <span onClick={handleSignout} className="cursor-pointer">Sign Out</span>
       </div>
        {updateUserError && (<Alert color='failure' className='w-full text-center mt-5'>{updateUserError}</Alert>)}
       {updateUserSuccess && (<Alert color='success' className='w-full text-center mt-5'>{updateUserSuccess}</Alert>)}
