@@ -5,14 +5,15 @@ import { updateStart, updateSuccess, updateFailure,deleteUserFailure,deleteUserS
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import 'react-circular-progressbar/dist/styles.css';
+import { Link } from "react-router-dom";
 
 export default function DashProfile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser,loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(localStorage.getItem("profilePicture") || currentUser.profilePicture);
   const filePickerRef = useRef();
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
   const [updateUserError, setUpdateUserError] = useState(null);
@@ -77,22 +78,21 @@ export default function DashProfile() {
     e.preventDefault();
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
-
+  
     if (Object.keys(formData).length === 0) {
       setUpdateUserError('No changes made');
       return;
     }
-
+  
     if (imageFileUploading) {
       setUpdateUserError('Please wait for image to upload');
       return;
     }
-
+  
     try {
       dispatch(updateStart());
-      setLoading(true);
       setProgress(30);
-
+  
       const formDataToSend = new FormData();
       for (const key in formData) {
         formDataToSend.append(key, formData[key]);
@@ -100,39 +100,36 @@ export default function DashProfile() {
       if (imageFile) {
         formDataToSend.append("profilePictureFile", imageFile);
       }
-
+  
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${currentUser?.token}`,
-        },
         credentials: 'include',
-        body: formDataToSend,
+        body: formDataToSend, // No need for JSON.stringify()
       });
-
+  
       setProgress(70);
       const data = await res.json();
-
+  
       if (!res.ok) {
-        dispatch(updateFailure(data.message));
-        setUpdateUserError(data.message);
-      } else {
-        dispatch(updateSuccess(data));
-        setUpdateUserSuccess("User's profile updated successfully");
-
-        // Persist changes in localStorage
-        localStorage.setItem("profilePicture", data.profilePicture);
-        setImageFileUrl(data.profilePicture);
+        throw new Error(data.message || 'Failed to update profile');
       }
+  
+      dispatch(updateSuccess(data));
+      setUpdateUserSuccess("User's profile updated successfully");
+  
+      // Persist changes in localStorage
+      localStorage.setItem("profilePicture", data.profilePicture);
+      setImageFileUrl(data.profilePicture);
+  
       setProgress(100);
     } catch (error) {
       dispatch(updateFailure(error.message));
       setUpdateUserError(error.message);
     } finally {
-      setLoading(false);
       setTimeout(() => setProgress(0), 1000);
     }
   };
+  
 
 
 
@@ -213,9 +210,20 @@ export default function DashProfile() {
         <TextInput type="email" id="email" placeholder="Email" defaultValue={currentUser.email} onChange={handleChange} />
         <TextInput type="password" id="password" placeholder="New Password" onChange={handleChange} />
 
-        <Button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-1 rounded-lg outline" disabled={loading}>
-          {loading ? "Updating..." : "Update"}
+        <Button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-1 rounded-lg outline" disabled={loading||imageFileUploading}>
+          {loading ? "Loading..." : "Update"}
         </Button>
+        {currentUser.isAdmin && (
+          <Link to={'/create-post'}>
+            <Button
+              type='button'
+              gradientDuoTone='purpleToPink'
+              className='w-full'
+            >
+              Create a post
+            </Button>
+          </Link>
+        )}
       </form>
 
       <div className="text-red-500 flex justify-between mt-5">
