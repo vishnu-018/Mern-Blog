@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/user.routes.js';
 import authRoutes from './routes/auth.route.js';
 import cookieParser from 'cookie-parser';
+import postRoutes from  './routes/post.route.js';
 dotenv.config();
 
 // Correctly format the MongoDB connection string and call mongoose.connect
@@ -27,6 +28,7 @@ app.listen(3000, () => {
 
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/post',postRoutes);
 
 // Corrected error-handling middleware syntax
 app.use((err, req, res, next) => {
