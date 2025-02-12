@@ -6,7 +6,7 @@ import { Table } from 'flowbite-react';
 export default function DashPosts() {
   const { currentUser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
-  const [ setShowMore] = useState(true);
+  const [showMore, setShowMore] = useState(true);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -29,52 +29,82 @@ export default function DashPosts() {
     }
   }, [currentUser?._id]);
 
+  const handleShowMore = async () => {
+    const startIndex = userPosts.length;
+    try {
+      const res = await fetch(
+        `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) => [...prev, ...data.posts]);
+        if (data.posts.length < 9) {
+          setShowMore(false);
+        }
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
-    <div className="max-h-[500px] overflow-y-auto overflow-x-auto md:mx-auto p-3 scrollbar scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
+    <div className="min-h-screen flex flex-col">
+    <div className="flex-grow overflow-y-auto overflow-x-auto md:mx-auto p-3 scrollbar scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
       {currentUser.isAdmin && userPosts.length > 0 ? (
-        <Table hoverable className="shadow-md w-full">
-        <Table.Head className="relative bg-gray-200 dark:bg-gray-900">
+        <>
+          <Table hoverable className="shadow-md w-full">
+            <Table.Head className="relative bg-gray-200 dark:bg-gray-900">
+              <Table.HeadCell>DATE UPDATED</Table.HeadCell>
+              <Table.HeadCell>POST IMAGE</Table.HeadCell>
+              <Table.HeadCell>POST TITLE</Table.HeadCell>
+              <Table.HeadCell>CATEGORY</Table.HeadCell>
+              <Table.HeadCell>DELETE</Table.HeadCell>
+              <Table.HeadCell>
+                <span>Edit</span>
+              </Table.HeadCell>
+            </Table.Head>
+            <Table.Body className="divide-y">
+  {userPosts.map((post) => (
+    <Table.Row key={post._id} className="relative bg-white dark:border-gray-700 dark:bg-gray-800 py-4">
+      <Table.Cell className="py-4">{new Date(post.updatedAt).toLocaleDateString()}</Table.Cell>
+      <Table.Cell className="py-4">
+        <Link to={`/post/${post.slug}`}>
+          <img src={post.image} alt={post.title} className="w-20 h-12 object-cover bg-gray-500" />
+        </Link>
+      </Table.Cell>
+      <Table.Cell className="py-4">
+        <Link className="font-medium text-gray-900 dark:text-white" to={`/post/${post.slug}`}>
+          {post.title}
+        </Link>
+      </Table.Cell>
+      <Table.Cell className="py-4">{post.category}</Table.Cell>
+      <Table.Cell className="py-4">
+        <span className="font-medium text-red-500 hover:underline cursor-pointer">Delete</span>
+      </Table.Cell>
+      <Table.Cell className="py-4">
+        <Link className="text-teal-500 hover:underline" to={`/update-post/${post._id}`}>
+          <span>Edit</span>
+        </Link>
+      </Table.Cell>
+    </Table.Row>
+  ))}
+</Table.Body>
 
-            <Table.HeadCell>DATE UPDATED</Table.HeadCell>
-            <Table.HeadCell>POST IMAGE</Table.HeadCell>
-            <Table.HeadCell>POST TITLE</Table.HeadCell>
-            <Table.HeadCell>CATEGORY</Table.HeadCell>
-            <Table.HeadCell>DELETE</Table.HeadCell>
-            <Table.HeadCell>
-              <span>Edit</span>
-            </Table.HeadCell>
-          </Table.Head>
-          <Table.Body className="divide-y">
-            {userPosts.map((post) => (
-             <Table.Row key={post._id} className="relative bg-white dark:border-gray-700 dark:bg-gray-800">
+          </Table>
 
-                <Table.Cell>{new Date(post.updatedAt).toLocaleDateString()}</Table.Cell>
-                <Table.Cell>
-                  <Link to={`/post/${post.slug}`}>
-                    <img src={post.image} alt={post.title} className="w-20 h-10 object-cover bg-gray-500" />
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link className="font-medium text-gray-900 dark:text-white" to={`/post/${post.slug}`}>
-                    {post.title}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>{post.category}</Table.Cell>
-                <Table.Cell>
-                  <span className="font-medium text-red-500 hover:underline cursor-pointer">Delete</span>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link className="text-teal-500 hover:underline" to={`/update-post/${post._id}`}>
-                    <span>Edit</span>
-                  </Link>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
+          {showMore && (
+            <button
+              onClick={handleShowMore}
+              className="w-full text-teal-500 self-center text-sm py-7"
+            >
+              Show more
+            </button>
+          )}
+        </>
       ) : (
         <p>You have no posts yet!</p>
       )}
+    </div>
     </div>
   );
 }
