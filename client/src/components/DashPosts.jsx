@@ -79,12 +79,12 @@ export default function DashPosts() {
         <>
           <Table hoverable className="shadow-md w-full">
             <Table.Head className="relative bg-gray-200 dark:bg-gray-900">
-              <Table.HeadCell>DATE UPDATED</Table.HeadCell>
-              <Table.HeadCell>POST IMAGE</Table.HeadCell>
-              <Table.HeadCell>POST TITLE</Table.HeadCell>
-              <Table.HeadCell>CATEGORY</Table.HeadCell>
-              <Table.HeadCell>DELETE</Table.HeadCell>
-              <Table.HeadCell>
+              <Table.HeadCell className='py-4 text-left pl-4 '>DATE UPDATED</Table.HeadCell>
+              <Table.HeadCell className='py-4 text-left pl-4 ' >POST IMAGE</Table.HeadCell>
+              <Table.HeadCell className='py-4 text-center'>POST TITLE</Table.HeadCell>
+              <Table.HeadCell className='py-4 text-left pl-4 '>CATEGORY</Table.HeadCell>
+              <Table.HeadCell className='py-4 text-left pl-4 '>DELETE</Table.HeadCell>
+              <Table.HeadCell className='py-4 text-left pl-4 '>
                 <span>Edit</span>
               </Table.HeadCell>
             </Table.Head>
