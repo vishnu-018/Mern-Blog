@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 import flowbite from 'flowbite/plugin';
 import tailwindScrollbar from 'tailwind-scrollbar';
-import lineClamp from '@tailwindcss/line-clamp';
+
 
 export default {
   content: [
@@ -16,6 +16,6 @@ export default {
   plugins: [
     flowbite,
     tailwindScrollbar,
-    lineClamp, // Use the imported plugin here
+    // Use the imported plugin here
   ],
 };
