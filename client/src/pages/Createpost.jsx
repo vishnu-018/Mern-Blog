@@ -135,7 +135,9 @@ export default function Createpost() {
 
                     <Button
                         type="button"
+                         className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
                         onClick={handleUploadImage}
+                        disabled={imageUploadProgress}
                     >
                         {imageUploadProgress ? (
                             <div className='w-16 h-16'>

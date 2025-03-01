@@ -168,14 +168,7 @@ export default function UpdatePost() {
           <Button
             type="button"
             onClick={handleUploadImage} // ✅ Fixed function name typo here
-            className="relative py-2 px-6 font-semibold rounded-full border-2 border-transparent text-transparent bg-clip-text 
-                       bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6] 
-                       dark:from-[#7C3AED] dark:to-[#2563EB] 
-                       before:absolute before:inset-0 before:rounded-full before:bg-gradient-to-r 
-                       before:from-[#8B5CF6] before:to-[#3B82F6] 
-                       dark:before:from-[#7C3AED] dark:before:to-[#2563EB] 
-                       before:-z-10 before:border-2 before:border-transparent
-                       border-[#8B5CF6] hover:border-b-[#3B82F6] hover:bg-transparent"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
           > 
             {imageUploadProgress ? (
               <div className='w-16 h-16'>
