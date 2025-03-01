@@ -14,7 +14,11 @@ export default function DashPosts() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch(`/api/post/getposts?userId=${currentUser._id}`);
+        const res = await fetch(
+          currentUser?.isAdmin 
+          ? `/api/post/getposts` // Admins fetch all posts
+          : `/api/post/getposts?userId=${currentUser._id}` // Regular users fetch only their posts
+      );
         const data = await res.json();
         if (res.ok) {
           setUserPosts(data.posts);
@@ -27,17 +31,19 @@ export default function DashPosts() {
       }
     };
 
-    if (currentUser?.isAdmin) {
+    if (currentUser) {
       fetchPosts();
     }
-  }, [currentUser?._id]);
+  }, [currentUser]);
 
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
     try {
       const res = await fetch(
-        `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
-      );
+        currentUser?.isAdmin 
+        ? `/api/post/getposts?startIndex=${startIndex}` 
+        : `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
+    );
       const data = await res.json();
       if (res.ok) {
         setUserPosts((prev) => [...prev, ...data.posts]);
@@ -73,12 +79,12 @@ export default function DashPosts() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col w-full">
     <div className="flex-grow overflow-y-auto overflow-x-auto md:mx-auto p-3 scrollbar scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
-      {currentUser.isAdmin && userPosts.length > 0 ? (
+      { userPosts.length > 0 ? (
         <>
           <Table hoverable className="shadow-md w-full">
-            <Table.Head className="relative bg-gray-200 dark:bg-gray-900">
+            <Table.Head className="relative bg-gray-200 dark:bg-gray-900 w-full">
               <Table.HeadCell className='py-4 text-left pl-4 '>DATE UPDATED</Table.HeadCell>
               <Table.HeadCell className='py-4 text-left pl-4 ' >POST IMAGE</Table.HeadCell>
               <Table.HeadCell className='py-4 text-center'>POST TITLE</Table.HeadCell>
@@ -130,7 +136,7 @@ export default function DashPosts() {
           )}
         </>
       ) : (
-        <p>You have no posts yet!</p>
+        <p>  {currentUser.isAdmin ? 'No posts available' : 'You have no posts yet!'}You have no posts yet!</p>
       )}
       <Modal show={showModal} onClose={() => setShowModal(false)} popup size="md"  className="flex items-center justify-center min-h-screen">
         <Modal.Header />

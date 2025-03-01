@@ -137,11 +137,26 @@ export default function UpdatePost() {
           }
           value={formData.category}
           >
-            <option value='uncategorized'>Select a category</option>
-            <option value='javascript'>JavaScript</option>
-            <option value='reactjs'>React.js</option>
-            <option value='nextjs'>Next.js</option>
+            <option value='Uncategorized'>Select a category</option>
+            <option value='Project innovations'>Project Innovations</option>
+            <option value='Certifications'>Certifications</option>
+            <option value='Academic Excellence'>Academic Excellence</option>
+            <option value='Competitions'>Competitions</option>
+            <option value='Product Development'>Product Development</option>
+            <option value='Patent'>Patent</option>
+            <option value='Paper Presentation'>Paper Presentation</option>
+           
           </Select>
+          <Select
+                        onChange={(e) =>
+                            setFormData({ ...formData, year: e.target.value })
+                        }>
+                        <option value=''>Select Year</option>
+                        <option value='1st Year'>1st Year</option>
+                        <option value='2nd Year'>2nd Year</option>
+                        <option value='3rd Year'>3rd Year</option>
+                        <option value='4th Year'>4th Year</option>
+                    </Select>
         </div>
         <div className='flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3'>
           <FileInput

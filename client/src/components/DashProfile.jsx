@@ -213,7 +213,7 @@ export default function DashProfile() {
         <Button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-1 rounded-lg outline" disabled={loading||imageFileUploading}>
           {loading ? "Loading..." : "Update"}
         </Button>
-        {currentUser.isAdmin && (
+        
           <Link to={'/create-post'}>
             <Button
               type='button'
@@ -223,7 +223,7 @@ export default function DashProfile() {
               Create a post
             </Button>
           </Link>
-        )}
+        
       </form>
 
       <div className="text-red-500 flex justify-between mt-5">

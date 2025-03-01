@@ -1,6 +1,6 @@
 import { Button, Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import CommentSection from '../components/CommentSection';
 import PostCard from '../components/PostCard';
@@ -14,12 +14,14 @@ export default function PostPage() {
     const [error, setError] = useState(false);
     const [post, setPost] = useState(null);
     const [recentPosts, setRecentPosts] = useState(null);
+    const navigate=useNavigate();
     useEffect(() => {
         const fetchPost = async () => {
           try {
             setLoading(true);
             const res = await fetch(`/api/post/getposts?slug=${postSlug}`);
             const data = await res.json();
+            console.log(data.posts[0]);
             if (!res.ok) {
               setError(true);
               setLoading(false);
@@ -81,8 +83,19 @@ export default function PostPage() {
       >
         <Button color='gray' pill size='xs'>
           {post && post.category}
+         
         </Button>
       </Link>
+      <Button
+  color='gray'
+  pill
+  size='xs'
+  className='self-center mt-5'
+  onClick={() => navigate(`/search?year=${post?.year}`)}
+>
+  {post?.year}
+</Button>
+       
       <img
         src={post && post.image}
         alt={post && post.title}
@@ -94,6 +107,8 @@ export default function PostPage() {
           {post && (post.content.length / 1000).toFixed(0)} mins read
         </span>
       </div>
+
+      
       <div
         className='p-3 max-w-2xl mx-auto w-full post-content'
         dangerouslySetInnerHTML={{ __html: post && post.content }}

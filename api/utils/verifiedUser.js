@@ -18,3 +18,11 @@ export const verifyToken = (req, res, next) => {
     next();
   });
 };
+
+export const verifyUserOrAdmin = (req, res, next) => {
+  if (req.user?.role === 'admin' || req.user?.role === 'user') {
+      next();
+  } else {
+      res.status(403).json({ message: 'Access denied' });
+  }
+};

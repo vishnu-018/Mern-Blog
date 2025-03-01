@@ -10,14 +10,14 @@ import {
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { signoutSuccess } from '../redux/user/userSlice';
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function DashSidebar() {
   const location = useLocation();
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const [tab, setTab] = useState('');
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get('tab');
@@ -25,6 +25,7 @@ export default function DashSidebar() {
       setTab(tabFromUrl);
     }
   }, [location.search]);
+
   const handleSignout = async () => {
     try {
       const res = await fetch('/api/user/signout', {
@@ -40,11 +41,13 @@ export default function DashSidebar() {
       console.log(error.message);
     }
   };
+
   return (
     <Sidebar className='w-full md:w-56'>
       <Sidebar.Items>
         <Sidebar.ItemGroup className='flex flex-col gap-1'>
-          {currentUser && currentUser.isAdmin && (
+          {/* Admin-only Dashboard option */}
+          {currentUser?.isAdmin && (
             <Link to='/dashboard?tab=dash'>
               <Sidebar.Item
                 active={tab === 'dash' || !tab}
@@ -55,6 +58,8 @@ export default function DashSidebar() {
               </Sidebar.Item>
             </Link>
           )}
+
+          {/* Common options for both Admins and Users */}
           <Link to='/dashboard?tab=profile'>
             <Sidebar.Item
               active={tab === 'profile'}
@@ -66,39 +71,41 @@ export default function DashSidebar() {
               Profile
             </Sidebar.Item>
           </Link>
-          {currentUser.isAdmin && (
-            <Link to='/dashboard?tab=posts'>
+
+          <Link to='/dashboard?tab=posts'>
+            <Sidebar.Item
+              active={tab === 'posts'}
+              icon={HiDocumentText}
+              as='div'
+            >
+              Posts
+            </Sidebar.Item>
+          </Link>
+
+          <Link to='/dashboard?tab=comments'>
+            <Sidebar.Item
+              active={tab === 'comments'}
+              icon={HiAnnotation}
+              as='div'
+            >
+              Comments
+            </Sidebar.Item>
+          </Link>
+
+          {/* Admin-only options */}
+          {currentUser?.isAdmin && (
+            <Link to='/dashboard?tab=users'>
               <Sidebar.Item
-                active={tab === 'posts'}
-                icon={HiDocumentText}
+                active={tab === 'users'}
+                icon={HiOutlineUserGroup}
                 as='div'
               >
-                Posts
+                Users
               </Sidebar.Item>
             </Link>
           )}
-          {currentUser.isAdmin && (
-            <>
-              <Link to='/dashboard?tab=users'>
-                <Sidebar.Item
-                  active={tab === 'users'}
-                  icon={HiOutlineUserGroup}
-                  as='div'
-                >
-                  Users
-                </Sidebar.Item>
-              </Link>
-              <Link to='/dashboard?tab=comments'>
-                <Sidebar.Item
-                  active={tab === 'comments'}
-                  icon={HiAnnotation}
-                  as='div'
-                >
-                  Comments
-                </Sidebar.Item>
-              </Link>
-            </>
-          )}
+
+          {/* Sign Out option */}
           <Sidebar.Item
             icon={HiArrowSmRight}
             className='cursor-pointer'

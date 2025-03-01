@@ -1,4 +1,5 @@
 import { Button } from 'flowbite-react';
+import { Link } from 'react-router-dom';
 
 export default function CallToAction() {
   return (
@@ -11,9 +12,9 @@ export default function CallToAction() {
             Discover inspiring stories and accomplishments from talented students.
             </p>
             <Button gradientDuoTone='purpleToPink' className='rounded-tl-xl rounded-bl-none'>
-                <a href="https://www.100jsprojects.com" target='_blank' rel='noopener noreferrer'>
-                View Student Achievements
-                </a>
+            <Link to="/search">
+            View Student Achievements
+          </Link>
             </Button>
         </div>
         <div className="p-7 flex-1">

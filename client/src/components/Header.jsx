@@ -80,7 +80,7 @@ export default function Header() {
         </Button>
 
         <div className="hidden sm:flex gap-4">
-          {["/", "/about", "/projects"].map((path, index) => (
+          {["/", "/about"].map((path, index) => (
             <Link key={index} to={path} className={`font-bold hover:underline ${isActive(path) ? "text-blue-500" : "text-gray-900 dark:text-white"}`}>
               {path === "/" ? "Home" : path.substring(1).charAt(0).toUpperCase() + path.slice(2)}
             </Link>

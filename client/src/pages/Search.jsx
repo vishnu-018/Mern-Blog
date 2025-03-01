@@ -8,6 +8,7 @@ export default function Search() {
     searchTerm: '',
     sort: 'desc',
     category: 'uncategorized',
+    year: '',
   });
 
   console.log(sidebarData);
@@ -24,12 +25,14 @@ export default function Search() {
     const searchTermFromUrl = urlParams.get('searchTerm');
     const sortFromUrl = urlParams.get('sort');
     const categoryFromUrl = urlParams.get('category');
-    if (searchTermFromUrl || sortFromUrl || categoryFromUrl) {
+    const yearFromUrl=urlParams.get('year');
+    if (searchTermFromUrl || sortFromUrl || categoryFromUrl||yearFromUrl) {
       setSidebarData({
         ...sidebarData,
         searchTerm: searchTermFromUrl,
         sort: sortFromUrl,
         category: categoryFromUrl,
+        year: yearFromUrl || '',
       });
     }
 
@@ -67,6 +70,10 @@ export default function Search() {
       const category = e.target.value || 'uncategorized';
       setSidebarData({ ...sidebarData, category });
     }
+    if (e.target.id === 'year') {
+      const year = e.target.value || '';
+      setSidebarData({ ...sidebarData, year });
+  }
   };
 
   const handleSubmit = (e) => {
@@ -75,6 +82,7 @@ export default function Search() {
     urlParams.set('searchTerm', sidebarData.searchTerm);
     urlParams.set('sort', sidebarData.sort);
     urlParams.set('category', sidebarData.category);
+    urlParams.set('year', sidebarData.year);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
   };
@@ -130,15 +138,27 @@ export default function Search() {
               value={sidebarData.category}
               id='category'
             >
-              <option value='uncategorized'>Uncategorized</option>
-              <option value='projectinnovations'>Project Innovations</option>
-            <option value='certifications'>Certifications</option>
-            <option value='nextjs'>Academic Excellence</option>
-              <option value='reactjs'>React.js</option>
-              <option value='nextjs'>Next.js</option>
-              <option value='javascript'>JavaScript</option>
+              <option value='Uncategorized'>Uncategorized</option>
+              <option value='Project innovations'>Project Innovations</option>
+            <option value='Certifications'>Certifications</option>
+            <option value='Academic Excellence'>Academic Excellence</option>
+            <option value='Competitions'>Competitions</option>
+            <option value='Product Development'>Product Development</option>
+            <option value='Patent'>Patent</option>
+            <option value='Paper Presentation'>Paper Presentation</option>
             </Select>
           </div>
+          <div className='flex items-center gap-2'>
+  <label className='font-semibold'>Year:</label>
+  <Select onChange={handleChange} value={sidebarData.year} id='year'>
+    <option value=''>Select Year</option>
+    <option value='1st Year'>1st Year</option>
+    <option value='2nd Year'>2nd Year</option>
+    <option value='3rd Year'>3rd Year</option>
+    <option value='4th Year'>4th Year</option>
+   
+  </Select>
+</div>
           <Button type='submit'  gradientDuoTone='purpleToPink'  className="px-2 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg border-1 border-transparent hover:border-purple-500 transition">
             Apply Filters
           </Button>
