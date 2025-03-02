@@ -1,16 +1,11 @@
 import { Alert, Button, FileInput, Select, TextInput } from "flowbite-react";
 import { useRef, useState } from "react";
-
 import 'react-quill/dist/quill.snow.css';
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
-import { app } from "../firebase";
+import axios from 'axios'; // Added for Cloudinary upload
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useNavigate } from 'react-router-dom';
 import ReactQuill from "react-quill";
-
-
-
 
 export default function Createpost() {
     const [file, setFile] = useState(null);
@@ -22,42 +17,37 @@ export default function Createpost() {
     const quillRef = useRef(null);
 
     const handleUploadImage = async () => {
+        if (!file) {
+            setImageUploadError('Please select an image');
+            return;
+        }
+        setImageUploadError(null);
+        setImageUploadProgress(0);
+        const formDataCloud = new FormData();
+        formDataCloud.append('file', file);
+
         try {
-            if (!file) {
-                setImageUploadError('Please select an image');
-                return;
-            }
-
-            setImageUploadError(null);
-            const storage = getStorage(app);
-            const fileName = new Date().getTime() + '-' + file.name;
-            const storageRef = ref(storage, fileName);
-            const uploadTask = uploadBytesResumable(storageRef, file);
-
-            uploadTask.on(
-                'state_changed',
-                (snapshot) => {
-                    const progress =
-                        (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    setImageUploadProgress(progress.toFixed(0));
-                },
-                (error) => {
-                    console.log('Upload Error:', error);
-                    setImageUploadError('Image upload failed');
-                    setImageUploadProgress(null);
-                },
-                () => {
-                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                        setImageUploadProgress(null);
-                        setImageUploadError(null);
-                        setFormData({ ...formData, image: downloadURL });
-                    });
+            const response = await axios.post(
+                'http://localhost:3000/api/upload',
+                formDataCloud,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                    onUploadProgress: (progressEvent) => {
+                        const progress = Math.round(
+                            (progressEvent.loaded * 100) / progressEvent.total
+                        );
+                        setImageUploadProgress(progress);
+                    },
                 }
             );
+            setImageUploadProgress(100);
+            setFormData({ ...formData, image: response.data.url });
         } catch (error) {
+            console.error('Cloudinary upload error:', error);
             setImageUploadError('Image upload failed');
             setImageUploadProgress(null);
-            console.log(error);
         }
     };
 
@@ -76,11 +66,8 @@ export default function Createpost() {
                 setPublishError(data.message);
                 return;
             }
-
-            if (res.ok) {
-                setPublishError(null);
-                navigate(`/post/${data.slug}`);
-            }
+            setPublishError(null);
+            navigate(`/post/${data.slug}`);
         } catch {
             setPublishError('Something went wrong');
         }
@@ -104,7 +91,8 @@ export default function Createpost() {
                     <Select
                         onChange={(e) =>
                             setFormData({ ...formData, category: e.target.value })
-                        }>
+                        }
+                    >
                         <option value='Uncategorized'>Select a category</option>
                         <option value='Project Innovations'>Project Innovations</option>
                         <option value='Certifications'>Certifications</option>
@@ -117,7 +105,8 @@ export default function Createpost() {
                     <Select
                         onChange={(e) =>
                             setFormData({ ...formData, year: e.target.value })
-                        }>
+                        }
+                    >
                         <option value=''>Select Year</option>
                         <option value='1st Year'>1st Year</option>
                         <option value='2nd Year'>2nd Year</option>
@@ -135,11 +124,11 @@ export default function Createpost() {
 
                     <Button
                         type="button"
-                         className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
                         onClick={handleUploadImage}
-                        disabled={imageUploadProgress}
+                        disabled={imageUploadProgress !== null && imageUploadProgress < 100}
                     >
-                        {imageUploadProgress ? (
+                        {imageUploadProgress && imageUploadProgress < 100 ? (
                             <div className='w-16 h-16'>
                                 <CircularProgressbar
                                     value={imageUploadProgress}
