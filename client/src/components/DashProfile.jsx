@@ -1,13 +1,7 @@
-import { Alert, Button, Modal, ModalBody, TextInput } from 'flowbite-react';
+import { Alert, Button, Modal, TextInput } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from 'firebase/storage';
-import { app } from '../firebase';
+import axios from 'axios'; // For Cloudinary upload
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import {
@@ -36,6 +30,7 @@ export default function DashProfile() {
   const [formData, setFormData] = useState({});
   const filePickerRef = useRef();
   const dispatch = useDispatch();
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -43,54 +38,55 @@ export default function DashProfile() {
       setImageFileUrl(URL.createObjectURL(file));
     }
   };
+
   useEffect(() => {
     if (imageFile) {
       uploadImage();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageFile]);
 
+  // Replace Firebase storage upload with Cloudinary upload via your backend endpoint
   const uploadImage = async () => {
-    // service firebase.storage {
-    //   match /b/{bucket}/o {
-    //     match /{allPaths=**} {
-    //       allow read;
-    //       allow write: if
-    //       request.resource.size < 2 * 1024 * 1024 &&
-    //       request.resource.contentType.matches('image/.*')
-    //     }
-    //   }
-    // }
     setImageFileUploading(true);
     setImageFileUploadError(null);
-    const storage = getStorage(app);
-    const fileName = new Date().getTime() + imageFile.name;
-    const storageRef = ref(storage, fileName);
-    const uploadTask = uploadBytesResumable(storageRef, imageFile);
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    setImageFileUploadProgress(0);
 
-        setImageFileUploadProgress(progress.toFixed(0));
-      },
-      (error) => {
-        setImageFileUploadError(
-          'Could not upload image (File must be less than 2MB)'
-        );
-        setImageFileUploadProgress(null);
-        setImageFile(null);
-        setImageFileUrl(null);
-        setImageFileUploading(false);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImageFileUrl(downloadURL);
-          setFormData({ ...formData, profilePicture: downloadURL });
-          setImageFileUploading(false);
-        });
-      }
-    );
+    const formDataCloud = new FormData();
+    formDataCloud.append('file', imageFile);
+
+    try {
+      const response = await axios.post(
+        'http://localhost:3000/api/upload',
+        formDataCloud,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (progressEvent) => {
+            const progress = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            console.log('Upload progress:', progress);
+            setImageFileUploadProgress(progress);
+          },
+        }
+      );
+      console.log('Upload completed:', response.data);
+      // Set the returned Cloudinary URL
+      setImageFileUrl(response.data.url);
+      setFormData((prev) => ({
+        ...prev,
+        profilePicture: response.data.url,
+      }));
+      // Ensure progress is 100% and upload flag is off
+      setImageFileUploadProgress(100);
+      setImageFileUploading(false);
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      setImageFileUploadError('Could not upload image');
+      setImageFileUploading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -131,6 +127,7 @@ export default function DashProfile() {
       setUpdateUserError(error.message);
     }
   };
+
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
@@ -164,6 +161,7 @@ export default function DashProfile() {
       console.log(error.message);
     }
   };
+
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
       <h1 className='my-7 text-center font-semibold text-3xl'>Profile</h1>
@@ -179,10 +177,10 @@ export default function DashProfile() {
           className='relative w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full'
           onClick={() => filePickerRef.current.click()}
         >
-          {imageFileUploadProgress && (
+          {imageFileUploadProgress !== null && (
             <CircularProgressbar
               value={imageFileUploadProgress || 0}
-              text={`${imageFileUploadProgress}%`}
+              text={`${imageFileUploadProgress || 0}%`}
               strokeWidth={5}
               styles={{
                 root: {
@@ -233,28 +231,24 @@ export default function DashProfile() {
           placeholder='password'
           onChange={handleChange}
         />
-       <Button
-  type="submit"
-  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-1 py-0.5 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
-  disabled={loading || imageFileUploading}
-  style={{
-    background: "linear-gradient(to right, #8B5CF6, #EC4899)",
-    color: "white", // Ensures text stays visible
-    border: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }}
->
-  {loading ? "Loading..." : "Update"}
-</Button>
+        <Button
+          type="submit"
+          className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-1 py-0.5 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
+          disabled={loading || imageFileUploading}
+          style={{
+            background: "linear-gradient(to right, #8B5CF6, #EC4899)",
+            color: "white",
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {loading ? "Loading..." : "Update"}
+        </Button>
         {currentUser.isAdmin && (
           <Link to={'/create-post'}>
-            <Button
-              type='button'
-              gradientDuoTone='purpleToPink'
-              className='w-full'
-            >
+            <Button type='button' gradientDuoTone='purpleToPink' className='w-full'>
               Create a post
             </Button>
           </Link>
@@ -283,7 +277,13 @@ export default function DashProfile() {
           {error}
         </Alert>
       )}
-     <Modal show={showModal} onClose={() => setShowModal(false)} popup size="md"  className="flex items-center justify-center min-h-screen">
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+        className="flex items-center justify-center min-h-screen"
+      >
         <Modal.Header />
         <Modal.Body>
           <div className="text-center">
@@ -292,14 +292,14 @@ export default function DashProfile() {
               Are you sure you want to delete your post?
             </h3>
             <div className='flex justify-center gap-4'>
-              <Button 
-                className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600" 
+              <Button
+                className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                 onClick={handleDeleteUser}
               >
                 Yes, I am sure
               </Button>
-              <Button 
-                className="bg-gray-300 text-gray-700 hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600" 
+              <Button
+                className="bg-gray-300 text-gray-700 hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                 onClick={() => setShowModal(false)}
               >
                 No, cancel

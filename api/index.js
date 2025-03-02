@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 import postRoutes from  './routes/post.route.js';
 import commentRoutes from './routes/comment.route.js';
 import cors from 'cors';
+import uploadRoutes from './routes/upload.js';
+
 dotenv.config();
 
 // Correctly format the MongoDB connection string and call mongoose.connect
@@ -19,6 +21,7 @@ mongoose.connect(process.env.MONGO)
     });
 
 const app = express();
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.json({ limit: "50mb" })); // Increase JSON payload limit
@@ -47,7 +50,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/post',postRoutes);
 app.use('/api/comment',commentRoutes);
-
+app.use('/api/upload', uploadRoutes);
 // Corrected error-handling middleware syntax
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
