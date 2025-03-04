@@ -6,6 +6,7 @@ import {
   HiOutlineUserGroup,
   HiAnnotation,
   HiChartPie,
+  HiCheckCircle, // Added an icon for Admin Approval
 } from 'react-icons/hi';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -73,44 +74,37 @@ export default function DashSidebar() {
           </Link>
 
           <Link to='/dashboard?tab=posts'>
-            <Sidebar.Item
-              active={tab === 'posts'}
-              icon={HiDocumentText}
-              as='div'
-            >
+            <Sidebar.Item active={tab === 'posts'} icon={HiDocumentText} as='div'>
               Posts
             </Sidebar.Item>
           </Link>
 
           <Link to='/dashboard?tab=comments'>
-            <Sidebar.Item
-              active={tab === 'comments'}
-              icon={HiAnnotation}
-              as='div'
-            >
+            <Sidebar.Item active={tab === 'comments'} icon={HiAnnotation} as='div'>
               Comments
             </Sidebar.Item>
           </Link>
 
           {/* Admin-only options */}
           {currentUser?.isAdmin && (
-            <Link to='/dashboard?tab=users'>
-              <Sidebar.Item
-                active={tab === 'users'}
-                icon={HiOutlineUserGroup}
-                as='div'
-              >
-                Users
-              </Sidebar.Item>
-            </Link>
+            <>
+              <Link to='/dashboard?tab=users'>
+                <Sidebar.Item active={tab === 'users'} icon={HiOutlineUserGroup} as='div'>
+                  Users
+                </Sidebar.Item>
+              </Link>
+
+              {/* ✅ Admin Approval Section */}
+              <Link to='/dashboard?tab=approval'>
+                <Sidebar.Item active={tab === 'approval'} icon={HiCheckCircle} as='div'>
+                  Admin Approval
+                </Sidebar.Item>
+              </Link>
+            </>
           )}
 
           {/* Sign Out option */}
-          <Sidebar.Item
-            icon={HiArrowSmRight}
-            className='cursor-pointer'
-            onClick={handleSignout}
-          >
+          <Sidebar.Item icon={HiArrowSmRight} className='cursor-pointer' onClick={handleSignout}>
             Sign Out
           </Sidebar.Item>
         </Sidebar.ItemGroup>

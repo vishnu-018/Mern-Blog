@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 const postSchema = new mongoose.Schema(
@@ -25,14 +24,23 @@ const postSchema = new mongoose.Schema(
       type: String,
       default: 'uncategorized',
     },
-    year:{
-    type:String,
-    required:true,
-  },
+    year: {
+      type: String,
+      required: true,
+    },
     slug: {
       type: String,
       required: true,
       unique: true,
+    },
+    isApproved: {
+      type: Boolean,
+      default: false, // New posts require admin approval
+    },
+    approvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', // Stores the admin's ID who approved the post
+      default: null,
     },
   },
   { timestamps: true }
