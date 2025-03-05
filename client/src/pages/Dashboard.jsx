@@ -6,6 +6,7 @@ import DashPosts from '../components/DashPosts';
 import DashUsers from '../components/DashUsers';
 import DashComments from '../components/DashComments';
 import DashBoardComp from '../components/DashBoardComp';
+import AdminApproval from '../components/AdminApproval';
 export default function Dashboard() {
   const location = useLocation();
   const [tab, setTab] = useState('');
@@ -35,6 +36,8 @@ export default function Dashboard() {
        {tab === 'comments' && <DashComments />}
         {/* dashboard comp */}
         {tab === 'dash' && <DashBoardComp />}
+         {/* admin approval */}
+         {tab === 'approval' && <AdminApproval />}
     </div>
   );
 
