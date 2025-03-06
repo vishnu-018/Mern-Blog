@@ -108,7 +108,9 @@ export default function DashPosts() {
           {post.title}
         </Link>
       </Table.Cell>
-      <Table.Cell className="py-4">{post.category}</Table.Cell>
+      <Table.Cell className="py-4">
+  {Array.isArray(post.category) ? post.category.join(', ') : post.category}
+</Table.Cell>
       <Table.Cell className="py-4">
         <span onClick={() => {
                         setShowModal(true);

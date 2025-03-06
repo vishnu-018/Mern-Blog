@@ -42,7 +42,11 @@ export const getposts = async (req, res, next) => {
       ...(req.query.slug && { slug: req.query.slug }),
       ...(req.query.postId && { _id: req.query.postId }),
       ...(req.query.year && { year: req.query.year }),
-      ...(req.query.category && { category: { $in: req.query.category.split(',') } }),
+      ...(req.query.category && {
+        category: Array.isArray(req.query.category) && req.query.category.length > 0 
+          ? { $in: req.query.category.filter(cat => cat) } // Remove null values
+          : { $in: ['uncategorized'] }, // Default category
+      }),
       ...(req.query.searchTerm && {
         $or: [
           { title: { $regex: req.query.searchTerm, $options: 'i' } },
@@ -56,7 +60,7 @@ export const getposts = async (req, res, next) => {
       .skip(startIndex)
       .limit(limit);
 
-    const totalPosts = await Post.countDocuments(filter); // Fix: Apply the same filter
+    const totalPosts = await Post.countDocuments(filter);
 
     const now = new Date();
     const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
@@ -74,6 +78,7 @@ export const getposts = async (req, res, next) => {
     next(error);
   }
 };
+
 
 export const deletepost = async (req, res, next) => {
   try {

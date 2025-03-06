@@ -39,6 +39,7 @@ export default function UpdatePost() {
           console.log("Fetched Categories:", data.posts[0].categories); // ✅ Log categories separately
   
           setFormData({
+            _id: data.posts[0]._id, 
             title: data.posts[0].title || "",
             year: data.posts[0].year || "",
             content: data.posts[0].content || "",
@@ -106,6 +107,10 @@ export default function UpdatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData._id) {
+      setPublishError("Post ID is missing. Try refreshing the page.");
+      return;
+    }
     try {
       const res = await fetch(`/api/post/updatepost/${formData._id}/${currentUser._id}`, {
         method: 'PUT',
