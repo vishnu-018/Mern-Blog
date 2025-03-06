@@ -21,8 +21,9 @@ const postSchema = new mongoose.Schema(
         'https://www.hostinger.com/tutorials/wp-content/uploads/sites/2/2021/09/how-to-write-a-blog-post.png',
     },
     category: {
-      type: String,
-      default: 'uncategorized',
+      type: [String],
+      required:true, // Changed from String to an array of strings
+      default: ['uncategorized'], // Default value as an array
     },
     year: {
       type: String,
@@ -33,15 +34,7 @@ const postSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    isApproved: {
-      type: Boolean,
-      default: false, // New posts require admin approval
-    },
-    approvedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Stores the admin's ID who approved the post
-      default: null,
-    },
+   
   },
   { timestamps: true }
 );

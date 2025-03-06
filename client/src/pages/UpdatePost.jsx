@@ -1,4 +1,4 @@
-import { Alert, Button, FileInput, Select, TextInput } from "flowbite-react";
+import { Alert, Button, FileInput, TextInput, Checkbox, Label } from "flowbite-react";
 import { useEffect, useState } from "react";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -12,7 +12,7 @@ export default function UpdatePost() {
   const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({ categories: [], year: "", title: "", content: "" });
   const [publishError, setPublishError] = useState(null);
   const navigate = useNavigate();
   const { postId } = useParams();
@@ -23,20 +23,39 @@ export default function UpdatePost() {
       try {
         const res = await fetch(`/api/post/getposts?postId=${postId}`);
         const data = await res.json();
+  
+        console.log("Full API Response:", data); // ✅ Check the entire response
+  
         if (!res.ok) {
-          console.log(data.message);
+          console.log("Error:", data.message);
           setPublishError(data.message);
           return;
         }
         setPublishError(null);
-        setFormData(data.posts[0]);
+  
+        // Ensure the post exists and has categories
+        if (data.posts && data.posts.length > 0) {
+          console.log("Fetched Post:", data.posts[0]); // ✅ Log the post data
+          console.log("Fetched Categories:", data.posts[0].categories); // ✅ Log categories separately
+  
+          setFormData({
+            title: data.posts[0].title || "",
+            year: data.posts[0].year || "",
+            content: data.posts[0].content || "",
+            image: data.posts[0].image || "",
+            categories: data.posts[0].category || [], // ✅ Check if this is null/undefined
+          });
+        } else {
+          console.log("No post found for given ID.");
+        }
       } catch (error) {
-        console.log(error.message);
+        console.log("Fetch error:", error.message);
       }
     };
-
+  
     fetchPost();
   }, [postId]);
+  
 
   // Use Cloudinary for image upload via backend
   const handleUploadImage = async () => {
@@ -74,6 +93,17 @@ export default function UpdatePost() {
     }
   };
 
+  const handleCheckboxChange = (category) => {
+    setFormData((prevData) => {
+      const updatedCategories = prevData.categories.includes(category)
+        ? prevData.categories.filter((c) => c !== category) // Remove if already selected
+        : [...prevData.categories, category]; // Add if not selected
+  
+      return { ...prevData, categories: updatedCategories };
+    });
+  };
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -92,7 +122,7 @@ export default function UpdatePost() {
       setPublishError(null);
       navigate(`/post/${data.slug}`);
     } catch (error) {
-      console.error("Update post error:", error); 
+      console.error("Update post error:", error);
       setPublishError('Something went wrong');
     }
   };
@@ -101,46 +131,51 @@ export default function UpdatePost() {
     <div className='p-3 max-w-3xl mx-auto min-h-screen'>
       <h1 className='text-center text-3xl my-7 font-semibold'>Update post</h1>
       <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
-        <div className='flex flex-col gap-4 sm:flex-row justify-between'>
-          <TextInput
-            type='text'
-            placeholder='Title'
-            required
-            id='title'
-            className='flex-1'
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            value={formData.title || ''}
-          />
-          <Select
-            onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
-            }
-            value={formData.category || ''}
-          >
-            <option value='Uncategorized'>Select a category</option>
-            <option value='Project innovations'>Project Innovations</option>
-            <option value='Certifications'>Certifications</option>
-            <option value='Academic Excellence'>Academic Excellence</option>
-            <option value='Competitions'>Competitions</option>
-            <option value='Product Development'>Product Development</option>
-            <option value='Patent'>Patent</option>
-            <option value='Paper Presentation'>Paper Presentation</option>
-          </Select>
-          <Select
-            onChange={(e) =>
-              setFormData({ ...formData, year: e.target.value })
-            }
-            value={formData.year || ''}
-          >
-            <option value=''>Select Year</option>
-            <option value='1st Year'>1st Year</option>
-            <option value='2nd Year'>2nd Year</option>
-            <option value='3rd Year'>3rd Year</option>
-            <option value='4th Year'>4th Year</option>
-          </Select>
-        </div>
+        <TextInput
+          type='text'
+          placeholder='Title'
+          required
+          id='title'
+          className='flex-1'
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          value={formData.title || ''}
+        />
+
+<div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  {[
+    "Project Innovations",
+    "Certifications",
+    "Academic Excellence",
+    "Competitions",
+    "Product Development",
+    "Patent",
+    "Paper Presentation"
+  ].map((category) => (
+    <Label key={category} className="flex items-center space-x-2">
+      <Checkbox
+        checked={formData.categories.includes(category)} // Check if category is selected
+        onChange={() => handleCheckboxChange(category)}
+      />
+      <span>{category}</span>
+    </Label>
+  ))}
+</div>
+
+
+        {/* Year Selection */}
+        <select
+          className="p-2 border rounded-md"
+          onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+          value={formData.year || ''}
+        >
+          <option value="">Select Year</option>
+          <option value="1st Year">1st Year</option>
+          <option value="2nd Year">2nd Year</option>
+          <option value="3rd Year">3rd Year</option>
+          <option value="4th Year">4th Year</option>
+        </select>
+
+        {/* File Upload */}
         <div className='flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3'>
           <FileInput
             type="file"
@@ -151,7 +186,7 @@ export default function UpdatePost() {
             type="button"
             onClick={handleUploadImage}
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
-          > 
+          >
             {imageUploadProgress ? (
               <div className='w-16 h-16'>
                 <CircularProgressbar
@@ -164,6 +199,7 @@ export default function UpdatePost() {
             )}
           </Button>
         </div>
+
         {imageUploadError && <Alert color='failure'>{imageUploadError}</Alert>}
         {formData.image && (
           <img
@@ -172,6 +208,7 @@ export default function UpdatePost() {
             className='w-full h-72 object-cover'
           />
         )}
+
         <ReactQuill
           theme="snow"
           value={formData.content || ''}
@@ -182,6 +219,7 @@ export default function UpdatePost() {
             setFormData({ ...formData, content: value });
           }}
         />
+
         <Button type='submit' gradientDuoTone='purpleToPink'>Update post</Button>
         {publishError && (
           <Alert className='mt-5' color='failure'>

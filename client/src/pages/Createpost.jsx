@@ -1,17 +1,17 @@
-import { Alert, Button, FileInput, Select, TextInput } from "flowbite-react";
+import { Alert, Button, FileInput, TextInput, Checkbox, Label } from "flowbite-react";
 import { useRef, useState } from "react";
 import 'react-quill/dist/quill.snow.css';
-import axios from 'axios'; // Added for Cloudinary upload
+import axios from 'axios'; 
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useNavigate } from 'react-router-dom';
 import ReactQuill from "react-quill";
 
-export default function Createpost() {
+export default function CreatePost() {
     const [file, setFile] = useState(null);
     const [imageUploadProgress, setImageUploadProgress] = useState(null);
     const [imageUploadError, setImageUploadError] = useState(null);
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState({ categories: [], year: "", title: "", content: "" });
     const [publishError, setPublishError] = useState(null);
     const navigate = useNavigate();
     const quillRef = useRef(null);
@@ -51,7 +51,18 @@ export default function Createpost() {
         }
     };
 
+    const handleCheckboxChange = (category) => {
+        setFormData((prevData) => {
+            const updatedCategories = prevData.categories.includes(category)
+                ? prevData.categories.filter((c) => c !== category)
+                : [...prevData.categories, category];
+                console.log("Updated Categories:", updatedCategories);
+            return { ...prevData, categories: updatedCategories };
+        });
+    };
+
     const handleSubmit = async (e) => {
+        console.log("Submitting Form Data:", formData);
         e.preventDefault();
         try {
             const res = await fetch('/api/post/create', {
@@ -59,7 +70,7 @@ export default function Createpost() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ ...formData, categories: [...formData.categories] }), // Ensure array format
             });
             const data = await res.json();
             if (!res.ok) {
@@ -77,51 +88,51 @@ export default function Createpost() {
         <div className='p-3 max-w-3xl mx-auto min-h-screen'>
             <h1 className='text-center text-3xl my-7 font-semibold'>Create a post</h1>
             <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
-                <div className='flex flex-col gap-4 sm:flex-row justify-between'>
-                    <TextInput
-                        type='text'
-                        placeholder='Title'
-                        required
-                        id='title'
-                        className='flex-1'
-                        onChange={(e) =>
-                            setFormData({ ...formData, title: e.target.value })
-                        }
-                    />
-                    <Select
-                        onChange={(e) =>
-                            setFormData({ ...formData, category: e.target.value })
-                        }
-                    >
-                        <option value='Uncategorized'>Select a category</option>
-                        <option value='Project Innovations'>Project Innovations</option>
-                        <option value='Certifications'>Certifications</option>
-                        <option value='Academic Excellence'>Academic Excellence</option>
-                        <option value='Competitions'>Competitions</option>
-                        <option value='Product Development'>Product Development</option>
-                        <option value='Patent'>Patent</option>
-                        <option value='Paper Presentation'>Paper Presentation</option>
-                    </Select>
-                    <Select
-                        onChange={(e) =>
-                            setFormData({ ...formData, year: e.target.value })
-                        }
-                    >
-                        <option value=''>Select Year</option>
-                        <option value='1st Year'>1st Year</option>
-                        <option value='2nd Year'>2nd Year</option>
-                        <option value='3rd Year'>3rd Year</option>
-                        <option value='4th Year'>4th Year</option>
-                    </Select>
+                <TextInput
+                    type='text'
+                    placeholder='Title'
+                    required
+                    id='title'
+                    className='flex-1'
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                />
+
+                {/* Multiple Category Selection */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {[
+                        "Project Innovations",
+                        "Certifications",
+                        "Academic Excellence",
+                        "Competitions",
+                        "Product Development",
+                        "Patent",
+                        "Paper Presentation"
+                    ].map((category) => (
+                        <Label key={category} className="flex items-center space-x-2">
+                            <Checkbox
+                                checked={formData.categories.includes(category)}
+                                onChange={() => handleCheckboxChange(category)}
+                            />
+                            <span>{category}</span>
+                        </Label>
+                    ))}
                 </div>
 
-                <div className='flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3'>
-                    <FileInput
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setFile(e.target.files[0])}
-                    />
+                {/* Year Selection */}
+                <select
+                    className="p-2 border rounded-md"
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                >
+                    <option value="">Select Year</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                </select>
 
+                {/* File Upload */}
+                <div className='flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3'>
+                    <FileInput type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
                     <Button
                         type="button"
                         className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
@@ -130,10 +141,7 @@ export default function Createpost() {
                     >
                         {imageUploadProgress && imageUploadProgress < 100 ? (
                             <div className='w-16 h-16'>
-                                <CircularProgressbar
-                                    value={imageUploadProgress}
-                                    text={`${imageUploadProgress || 0}%`}
-                                />
+                                <CircularProgressbar value={imageUploadProgress} text={`${imageUploadProgress || 0}%`} />
                             </div>
                         ) : (
                             'Upload Image'
@@ -143,11 +151,7 @@ export default function Createpost() {
 
                 {imageUploadError && <Alert color='failure'>{imageUploadError}</Alert>}
                 {formData.image && (
-                    <img
-                        src={formData.image}
-                        alt='upload'
-                        className='w-full h-72 object-cover'
-                    />
+                    <img src={formData.image} alt='upload' className='w-full h-72 object-cover' />
                 )}
 
                 <ReactQuill
@@ -162,11 +166,7 @@ export default function Createpost() {
                 />
 
                 <Button type='submit' gradientDuoTone='purpleToPink'>Publish</Button>
-                {publishError && (
-                    <Alert className='mt-5' color='failure'>
-                        {publishError}
-                    </Alert>
-                )}
+                {publishError && <Alert className='mt-5' color='failure'>{publishError}</Alert>}
             </form>
         </div>
     );
