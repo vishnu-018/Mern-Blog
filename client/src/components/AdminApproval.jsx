@@ -1,38 +1,92 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Table, Button } from 'flowbite-react';
+import { Link } from 'react-router-dom';
+import { Button, Modal, Table } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 export default function AdminApproval() {
   const { currentUser } = useSelector((state) => state.user);
-  const [pendingPosts, setPendingPosts] = useState([]);
+  const [userPosts, setUserPosts] = useState([]); // Posts created by users (non-admins)
+  const [showMore, setShowMore] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [postIdToDelete, setPostIdToDelete] = useState('');
 
   useEffect(() => {
-    const fetchPendingPosts = async () => {
+    const fetchPosts = async () => {
       try {
-        const res = await fetch('/api/post/getpendingposts');
+        const res = await fetch('/api/post/getposts?onlyUserPosts=true'); // Fetch only user-created posts
         const data = await res.json();
         if (res.ok) {
-          setPendingPosts(data.posts);
+          setUserPosts(data.posts);
+          if (data.posts.length < 9) {
+            setShowMore(false);
+          }
         }
       } catch (error) {
         console.log(error.message);
       }
     };
 
-    if (currentUser?.isAdmin) {
-      fetchPendingPosts();
+    if (currentUser && currentUser.isAdmin) {
+      fetchPosts();
     }
   }, [currentUser]);
 
-  const handleApprove = async (postId) => {
+  const handleShowMore = async () => {
+    const startIndex = userPosts.length;
     try {
-      const res = await fetch(`/api/post/approve/${postId}`, {
+      const res = await fetch(`/api/post/getposts?startIndex=${startIndex}&onlyUserPosts=true`);
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) => [...prev, ...data.posts]);
+        if (data.posts.length < 9) {
+          setShowMore(false);
+        }
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    setShowModal(false);
+    try {
+      const res = await fetch(
+        `/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        setUserPosts((prev) =>
+          prev.filter((post) => post._id !== postIdToDelete)
+        );
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleApprovePost = async (postId) => {
+    try {
+      const res = await fetch(`/api/post/approvePost/${postId}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ approved: true }),
       });
       const data = await res.json();
       if (res.ok) {
-        setPendingPosts((prev) => prev.filter((post) => post._id !== postId));
+        // Update the post's approval status in the UI
+        setUserPosts((prev) =>
+          prev.map((post) =>
+            post._id === postId ? { ...post, approved: true } : post
+          )
+        );
       } else {
         console.log(data.message);
       }
@@ -41,14 +95,19 @@ export default function AdminApproval() {
     }
   };
 
-  const handleDeny = async (postId) => {
+  const handleDenyPost = async (postId) => {
     try {
-      const res = await fetch(`/api/post/deny/${postId}`, {
-        method: 'DELETE',
+      const res = await fetch(`/api/post/denyPost/${postId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ approved: false }),
       });
       const data = await res.json();
       if (res.ok) {
-        setPendingPosts((prev) => prev.filter((post) => post._id !== postId));
+        // Remove the denied post from the UI
+        setUserPosts((prev) => prev.filter((post) => post._id !== postId));
       } else {
         console.log(data.message);
       }
@@ -58,42 +117,109 @@ export default function AdminApproval() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col w-full p-4">
-      <h2 className="text-2xl font-semibold text-center mb-4">Admin Approval Panel</h2>
-      {pendingPosts.length > 0 ? (
-        <Table hoverable className="shadow-md w-full">
-          <Table.Head className="bg-gray-200 dark:bg-gray-900">
-            <Table.HeadCell>Username</Table.HeadCell>
-            <Table.HeadCell>Post Title</Table.HeadCell>
-            <Table.HeadCell>Date</Table.HeadCell>
-            <Table.HeadCell>Category</Table.HeadCell>
-            <Table.HeadCell>Approval</Table.HeadCell>
-            <Table.HeadCell>Denial</Table.HeadCell>
-          </Table.Head>
-          <Table.Body className="divide-y">
-            {pendingPosts.map((post) => (
-              <Table.Row key={post._id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                <Table.Cell>{post.username}</Table.Cell>
-                <Table.Cell>{post.title}</Table.Cell>
-                <Table.Cell>{new Date(post.createdAt).toLocaleDateString()}</Table.Cell>
-                <Table.Cell>{post.category}</Table.Cell>
-                <Table.Cell>
-                  <Button className="bg-green-500 text-white flex items-center gap-2" onClick={() => handleApprove(post._id)}>
-                    <HiOutlineExclamationCircle className="w-5 h-5" /> Approve
-                  </Button>
-                </Table.Cell>
-                <Table.Cell>
-                  <Button className="bg-red-500 text-white" onClick={() => handleDeny(post._id)}>
-                    Deny
-                  </Button>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      ) : (
-        <p className="text-center text-gray-500">No pending posts for approval.</p>
-      )}
+    <div className="min-h-screen flex flex-col w-full">
+      <div className="flex-grow overflow-y-auto overflow-x-auto md:mx-auto p-3 scrollbar scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
+        {userPosts.length > 0 ? (
+          <>
+            <Table hoverable className="shadow-md w-full">
+              <Table.Head className="relative bg-gray-200 dark:bg-gray-900 w-full">
+                <Table.HeadCell className="py-4 text-left pl-4">DATE UPDATED</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-left pl-4">POST IMAGE</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-center">POST TITLE</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-left pl-4">CATEGORY</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-left pl-4">APPROVE</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-left pl-4">DENY</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-left pl-4">DELETE</Table.HeadCell>
+              </Table.Head>
+              <Table.Body className="divide-y">
+                {userPosts.map((post) => (
+                  <Table.Row key={post._id} className="relative bg-white dark:border-gray-700 dark:bg-gray-800 py-4">
+                    <Table.Cell className="py-4">{new Date(post.updatedAt).toLocaleDateString()}</Table.Cell>
+                    <Table.Cell className="py-4">
+                      <Link to={`/post/${post.slug}`}>
+                        <img src={post.image} alt={post.title} className="w-20 h-12 object-cover bg-gray-500" />
+                      </Link>
+                    </Table.Cell>
+                    <Table.Cell className="py-4">
+                      <Link className="font-medium text-gray-900 dark:text-white" to={`/post/${post.slug}`}>
+                        {post.title}
+                      </Link>
+                    </Table.Cell>
+                    <Table.Cell className="py-4">
+                      {Array.isArray(post.category) ? post.category.join(', ') : post.category}
+                    </Table.Cell>
+                    <Table.Cell className="py-4">
+                      <Button
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+                        onClick={() => handleApprovePost(post._id)}
+                        disabled={post.approved}
+                      >
+                        {post.approved ? 'Approved' : 'Approve'}
+                      </Button>
+                    </Table.Cell>
+                    <Table.Cell className="py-4">
+                      <Button
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                        onClick={() => handleDenyPost(post._id)}
+                      >
+                        Deny
+                      </Button>
+                    </Table.Cell>
+                    <Table.Cell className="py-4">
+                      <span
+                        onClick={() => {
+                          setShowModal(true);
+                          setPostIdToDelete(post._id);
+                        }}
+                        className="font-medium text-red-600 hover:underline cursor-pointer"
+                      >
+                        Delete
+                      </span>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+
+            {showMore && (
+              <button
+                onClick={handleShowMore}
+                className="w-full text-teal-500 self-center text-sm py-7"
+              >
+                Show more
+              </button>
+            )}
+          </>
+        ) : (
+          <p>No posts pending approval.</p>
+        )}
+
+        <Modal show={showModal} onClose={() => setShowModal(false)} popup size="md" className="flex items-center justify-center min-h-screen">
+          <Modal.Header />
+          <Modal.Body>
+            <div className="text-center">
+              <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+              <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
+                Are you sure you want to delete this post?
+              </h3>
+              <div className="flex justify-center gap-4">
+                <Button
+                  className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                  onClick={handleDeletePost}
+                >
+                  Yes, I am sure
+                </Button>
+                <Button
+                  className="bg-gray-300 text-gray-700 hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                  onClick={() => setShowModal(false)}
+                >
+                  No, cancel
+                </Button>
+              </div>
+            </div>
+          </Modal.Body>
+        </Modal>
+      </div>
     </div>
   );
 }

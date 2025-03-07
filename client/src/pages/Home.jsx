@@ -2,18 +2,40 @@ import { Link } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import { useEffect, useState } from 'react';
 import PostCard from '../components/PostCard';
+import { useSelector } from 'react-redux';
 
 export default function Home() {
+  const { currentUser } = useSelector((state) => state.user); // Get the current user
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const res = await fetch('/api/post/getPosts');
-      const data = await res.json();
-      setPosts(data.posts);
+      try {
+        const res = await fetch('/api/post/getPosts');
+        const data = await res.json();
+        if (res.ok) {
+          // Filter posts based on visibility rules
+          const filteredPosts = data.posts.filter((post) => {
+            if (post.isAdmin) {
+              return true; // Admin-created posts are visible to everyone
+            } else if (post.approved) {
+              return true; // Approved posts are visible to everyone
+            } else if (currentUser && post.userId === currentUser._id) {
+              return true; // Users can see their own unapproved posts
+            }
+            return false; // Hide other unapproved posts
+          });
+
+          setPosts(filteredPosts);
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
     };
+
     fetchPosts();
-  }, []);
+  }, [currentUser]); // Re-fetch posts when the current user changes
+
   return (
     <div>
       <div className='flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto '>
@@ -34,7 +56,7 @@ export default function Home() {
       </div>
 
       <div className='max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7'>
-        {posts && posts.length > 0 && (
+        {posts.length > 0 && (
           <div className='flex flex-col gap-6'>
             <h2 className='text-2xl font-semibold text-center'>Recent Posts</h2>
             <div className='flex flex-wrap gap-4'>

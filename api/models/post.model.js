@@ -34,7 +34,16 @@ const postSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-   
+    isAdmin: { type: Boolean, default: false },
+    approved: {
+      type: Boolean,
+      default: false, // Default to false for user-created posts
+    },
+    visibleTo: {
+      type: String,
+      enum: ['admin', 'owner', 'all'], // Define who can see the post
+      default: 'owner', // Default to 'owner' for user-created posts
+    },
   },
   { timestamps: true }
 );

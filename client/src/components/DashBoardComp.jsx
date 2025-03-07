@@ -200,7 +200,9 @@ export default function DashBoardComp() {
                           />
                         </Table.Cell>
                         <Table.Cell className='w-96'>{post.title}</Table.Cell>
-                        <Table.Cell className='w-5'>{post.category}</Table.Cell>
+                        <Table.Cell className="py-4">
+  {Array.isArray(post.category) ? post.category.join(', ') : post.category}
+</Table.Cell>
                       </Table.Row>
                     </Table.Body>
                   ))}
