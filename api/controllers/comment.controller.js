@@ -100,12 +100,22 @@ export const deleteComment = async (req, res, next) => {
 
 export const getcomments = async (req, res, next) => {
   try {
+    
+
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9;
-    const sortDirection = req.query.sort === 'desc' ? -1 : 1;
+    const sortDirection =-1
 
-    // Ensure regular users only see their own comments
-    const query = req.user.isAdmin ? {} : { userId: req.user.id };
+    // Ensure req.user exists before accessing its properties
+    if (!req.user) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
+    // Admins see all comments, regular users see only their own comments
+    const isAdmin = req.user.isAdmin === true; // Check nested isAdmin field
+    const query = isAdmin ? {} : { userId: req.user.id }; // Use userId from req.user.id
+
+   
 
     const comments = await Comment.find(query)
       .sort({ createdAt: sortDirection })
@@ -128,6 +138,7 @@ export const getcomments = async (req, res, next) => {
 
     res.status(200).json({ comments, totalComments, lastMonthComments });
   } catch (error) {
+    console.error("Error fetching comments:", error);
     next(error);
   }
 };

@@ -12,9 +12,14 @@ export default function DashComments() {
   const [commentIdToDelete, setCommentIdToDelete] = useState('');
 
   useEffect(() => {
+    if (!currentUser) return;
     const fetchComments = async () => {
       try {
-        const res = await fetch('/api/comment/getcomments');
+        const url = currentUser?.isAdmin
+        ? "/api/comment/getcomments" // Admin gets all comments
+        : `/api/comment/getcomments?userId=${currentUser?._id}`; // User gets only their comments
+        console.log("Fetching comments from:", url);
+      const res = await fetch(url);
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);

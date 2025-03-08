@@ -22,6 +22,10 @@ const commentSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    isAdmin: {
+      type: Boolean,
+      default: false, // Default value is false
+    },
   },
   { timestamps: true }
 );
