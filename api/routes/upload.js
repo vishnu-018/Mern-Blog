@@ -11,11 +11,15 @@ const upload = multer({ dest: 'uploads/' });
 // POST route for file uploads
 router.post('/', upload.single('file'), async (req, res) => {
   try {
+    console.log("Received file:", req.file);
     // Upload the file to Cloudinary; resource_type 'auto' handles both images and videos
     const result = await cloudinary.uploader.upload(req.file.path, {
       resource_type: 'auto',
+      timeout: 60000, // 60 seconds timeout
     });
+    console.log("Cloudinary upload result:", result); // Debugging: Log the Cloudinary response
     res.status(200).json({ url: result.secure_url });
+  
   } catch (error) {
     console.error('Cloudinary upload error:', error);
     res.status(500).json({ error: 'Upload failed', details: error.message });

@@ -11,6 +11,9 @@ export default function CreatePost() {
     const [file, setFile] = useState(null);
     const [imageUploadProgress, setImageUploadProgress] = useState(null);
     const [imageUploadError, setImageUploadError] = useState(null);
+    const [videoFile, setVideoFile] = useState(null);
+    const [videoUploadProgress, setVideoUploadProgress] = useState(null);
+    const [videoUploadError, setVideoUploadError] = useState(null);
     const [formData, setFormData] = useState({ categories: [], year: "", title: "", content: "" });
     const [publishError, setPublishError] = useState(null);
     const navigate = useNavigate();
@@ -25,7 +28,7 @@ export default function CreatePost() {
         setImageUploadProgress(0);
         const formDataCloud = new FormData();
         formDataCloud.append('file', file);
-
+        console.log("File to upload:", file); // Debugging: Log the file
         try {
             const response = await axios.post(
                 'http://localhost:3000/api/upload',
@@ -42,12 +45,49 @@ export default function CreatePost() {
                     },
                 }
             );
+            console.log("Upload response:", response.data); // Debugging: Log the response
             setImageUploadProgress(100);
             setFormData({ ...formData, image: response.data.url });
+            console.log("Updated formData:", formData); // Debugging: Log the updated formData
         } catch (error) {
             console.error('Cloudinary upload error:', error);
             setImageUploadError('Image upload failed');
             setImageUploadProgress(null);
+        }
+    };
+
+    const handleUploadVideo = async () => {
+        if (!videoFile) {
+            setVideoUploadError('Please select a video');
+            return;
+        }
+        setVideoUploadError(null);
+        setVideoUploadProgress(0);
+        const formDataCloud = new FormData();
+        formDataCloud.append('file', videoFile);
+
+        try {
+            const response = await axios.post(
+                'http://localhost:3000/api/upload',
+                formDataCloud,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                    onUploadProgress: (progressEvent) => {
+                        const progress = Math.round(
+                            (progressEvent.loaded * 100) / progressEvent.total
+                        );
+                        setVideoUploadProgress(progress);
+                    },
+                }
+            );
+            setVideoUploadProgress(100);
+            setFormData({ ...formData, video: response.data.url });
+        } catch (error) {
+            console.error('Cloudinary upload error:', error);
+            setVideoUploadError('Video upload failed');
+            setVideoUploadProgress(null);
         }
     };
 
@@ -130,9 +170,16 @@ export default function CreatePost() {
                     <option value="4th Year">4th Year</option>
                 </select>
 
-                {/* File Upload */}
+                {/* Image Upload */}
                 <div className='flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3'>
-                    <FileInput type="file" accept="image/*" onChange={(e) => setFile(e.target.files[0])} />
+                <FileInput 
+    type="file" 
+    accept="image/*" 
+    onChange={(e) => {
+        console.log("Selected file:", e.target.files[0]); // Debugging: Log the selected file
+        setFile(e.target.files[0]);
+    }} 
+/>
                     <Button
                         type="button"
                         className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
@@ -152,6 +199,33 @@ export default function CreatePost() {
                 {imageUploadError && <Alert color='failure'>{imageUploadError}</Alert>}
                 {formData.image && (
                     <img src={formData.image} alt='upload' className='w-full h-72 object-cover' />
+                )}
+
+                {/* Video Upload */}
+                <div className='flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3'>
+                    <FileInput type="file" accept="video/*" onChange={(e) => setVideoFile(e.target.files[0])} />
+                    <Button
+                        type="button"
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-lg border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
+                        onClick={handleUploadVideo}
+                        disabled={videoUploadProgress !== null && videoUploadProgress < 100}
+                    >
+                        {videoUploadProgress && videoUploadProgress < 100 ? (
+                            <div className='w-16 h-16'>
+                                <CircularProgressbar value={videoUploadProgress} text={`${videoUploadProgress || 0}%`} />
+                            </div>
+                        ) : (
+                            'Upload Video'
+                        )}
+                    </Button>
+                </div>
+
+                {videoUploadError && <Alert color='failure'>{videoUploadError}</Alert>}
+                {formData.video && (
+                    <video controls className='w-full h-72 object-cover'>
+                        <source src={formData.video} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
                 )}
 
                 <ReactQuill

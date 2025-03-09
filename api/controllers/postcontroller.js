@@ -21,6 +21,7 @@ export const create = async (req, res, next) => {
     category: Array.isArray(req.body.categories) && req.body.categories.length > 0 
       ? req.body.categories 
       : ['uncategorized'], 
+      video: req.body.video || '', 
       isAdmin: req.user.isAdmin === true ? true : false
   });
 
@@ -129,6 +130,7 @@ export const updatepost = async (req, res, next) => {
             ? req.body.categories.filter(cat => cat)  // Remove null values
             : post.category, // Retain old category if empty
           image: req.body.image,
+          video: req.body.video || post.video,
           year: req.body.year,
         },
       },
