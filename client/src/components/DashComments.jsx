@@ -117,7 +117,7 @@ export default function DashComments() {
                         <Table.Cell className="py-4 w-1/6">
                           {comment.content}
                         </Table.Cell>
-                        <Table.Cell className="py-4 w-1/6">
+                        <Table.Cell className="py-4 w-1/6 text-center">
                           {comment.numberOfLikes}
                         </Table.Cell>
                         <Table.Cell className="py-4 w-1/6">

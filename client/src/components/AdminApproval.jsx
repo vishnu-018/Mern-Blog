@@ -123,32 +123,34 @@ export default function AdminApproval() {
           <>
             <Table hoverable className="shadow-md w-full">
               <Table.Head className="relative bg-gray-200 dark:bg-gray-900 w-full">
-                <Table.HeadCell className="py-4 text-left pl-4">DATE UPDATED</Table.HeadCell>
-                <Table.HeadCell className="py-4 text-left pl-4">POST IMAGE</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-center">DATE UPDATED</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-center">POST IMAGE</Table.HeadCell>
                 <Table.HeadCell className="py-4 text-center">POST TITLE</Table.HeadCell>
-                <Table.HeadCell className="py-4 text-left pl-4">CATEGORY</Table.HeadCell>
-                <Table.HeadCell className="py-4 text-left pl-4">APPROVE</Table.HeadCell>
-                <Table.HeadCell className="py-4 text-left pl-4">DENY</Table.HeadCell>
-                <Table.HeadCell className="py-4 text-left pl-4">DELETE</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-center">CATEGORY</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-center">APPROVE</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-center">DENY</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-center">DELETE</Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
                 {userPosts.map((post) => (
                   <Table.Row key={post._id} className="relative bg-white dark:border-gray-700 dark:bg-gray-800 py-4">
-                    <Table.Cell className="py-4">{new Date(post.updatedAt).toLocaleDateString()}</Table.Cell>
-                    <Table.Cell className="py-4">
+                    <Table.Cell className="py-4 text-center">
+                      {new Date(post.updatedAt).toLocaleDateString()}
+                    </Table.Cell>
+                    <Table.Cell className="py-4 text-center">
                       <Link to={`/post/${post.slug}`}>
-                        <img src={post.image} alt={post.title} className="w-20 h-12 object-cover bg-gray-500" />
+                        <img src={post.image} alt={post.title} className="w-20 h-12 object-cover bg-gray-500 mx-auto" />
                       </Link>
                     </Table.Cell>
-                    <Table.Cell className="py-4">
+                    <Table.Cell className="py-4 text-center">
                       <Link className="font-medium text-gray-900 dark:text-white" to={`/post/${post.slug}`}>
                         {post.title}
                       </Link>
                     </Table.Cell>
-                    <Table.Cell className="py-4">
+                    <Table.Cell className="py-4 text-center">
                       {Array.isArray(post.category) ? post.category.join(', ') : post.category}
                     </Table.Cell>
-                    <Table.Cell className="py-4">
+                    <Table.Cell className="py-4 text-center">
                       <Button
                         className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
                         onClick={() => handleApprovePost(post._id)}
@@ -157,7 +159,7 @@ export default function AdminApproval() {
                         {post.approved ? 'Approved' : 'Approve'}
                       </Button>
                     </Table.Cell>
-                    <Table.Cell className="py-4">
+                    <Table.Cell className="py-4 text-center">
                       <Button
                         className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
                         onClick={() => handleDenyPost(post._id)}
@@ -165,7 +167,7 @@ export default function AdminApproval() {
                         Deny
                       </Button>
                     </Table.Cell>
-                    <Table.Cell className="py-4">
+                    <Table.Cell className="py-4 text-center">
                       <span
                         onClick={() => {
                           setShowModal(true);
