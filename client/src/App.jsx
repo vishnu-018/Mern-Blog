@@ -6,7 +6,6 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import Header from './components/Header';
-import Footer from './components/Footer';
 import PrivateRoute from './components/PrivateRoute';
 import Createpost from './pages/Createpost';
 import UpdatePost from './pages/UpdatePost';
@@ -42,7 +41,7 @@ const App = () => {
         <Route path='/projects' element={<Projects />} />
         <Route path='/post/:postSlug' element={<PostPage />} />
       </Routes>
-      <Footer />
+  
     </>
   );
 };

@@ -57,14 +57,16 @@ export default function Header() {
     <Navbar className="border-b-2 flex justify-between items-center bg-white dark:bg-gray-900">
       <Link to="/" className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white">
         <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
-          Inspire
+          BIT
         </span>
         Blog
       </Link>
 
       <form className="flex items-center gap-2"  onSubmit={handleSubmit}>
         <Button className="w-12 h-10 flex items-center justify-center bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600" pill>
-          <AiOutlineSearch className="text-gray-800 dark:text-gray-200" size={20} />
+         <Link to="/search">
+         <AiOutlineSearch className="text-gray-800 dark:text-gray-200" size={20} />
+         </Link> 
         </Button>
         <TextInput type="text" placeholder="Search..." className="hidden lg:inline dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"  value={searchTerm}  onChange={(e) => setSearchTerm(e.target.value)} />
       </form>

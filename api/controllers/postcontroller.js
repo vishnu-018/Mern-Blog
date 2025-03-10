@@ -55,6 +55,7 @@ export const getposts = async (req, res, next) => {
           { content: { $regex: req.query.searchTerm, $options: 'i' } },
         ],
       }),
+      ...(req.query.year && { year: req.query.year }), // Add year filter
       ...(req.query.onlyUserPosts === 'true' && { isAdmin: false }), // Exclude admin-created posts
     };
 
