@@ -35,7 +35,7 @@ export default function SignIn() {
 
       if (res.ok) {
         dispatch(signInSuccess(data));
-        navigate("/");
+        navigate("/home"); // Redirect to /home after successful sign-in
       }
     } catch (error) {
       dispatch(signInFailure(error.message));
