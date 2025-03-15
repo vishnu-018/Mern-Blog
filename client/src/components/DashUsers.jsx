@@ -29,7 +29,7 @@ export default function DashUsers() {
     if (currentUser.isAdmin) {
       fetchUsers();
     }
-  }, [currentUser._id]);
+  }, [currentUser._id, currentUser.isAdmin]); // Fixed: Added currentUser.isAdmin to dependencies
 
 
   const handleShowMore = async () => {

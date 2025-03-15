@@ -14,11 +14,13 @@ export default function AdminApproval() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('/api/post/getposts?onlyUserPosts=true'); // Fetch only user-created posts
+        const res = await fetch('/api/post/getposts?onlyUserPosts=true'); // Fetch all posts
         const data = await res.json();
         if (res.ok) {
-          setUserPosts(data.posts);
-          if (data.posts.length < 9) {
+          // Filter out admin-created posts
+          const filteredPosts = data.posts.filter((post) => !post.isAdmin);
+          setUserPosts(filteredPosts);
+          if (filteredPosts.length < 9) {
             setShowMore(false);
           }
         }
@@ -38,8 +40,10 @@ export default function AdminApproval() {
       const res = await fetch(`/api/post/getposts?startIndex=${startIndex}&onlyUserPosts=true`);
       const data = await res.json();
       if (res.ok) {
-        setUserPosts((prev) => [...prev, ...data.posts]);
-        if (data.posts.length < 9) {
+        // Filter out admin-created posts
+        const filteredPosts = data.posts.filter((post) => !post.isAdmin);
+        setUserPosts((prev) => [...prev, ...filteredPosts]);
+        if (filteredPosts.length < 9) {
           setShowMore(false);
         }
       }

@@ -31,7 +31,7 @@ export default function CreatePost() {
         console.log("File to upload:", file); // Debugging: Log the file
         try {
             const response = await axios.post(
-                'http://localhost:3000/api/upload',
+                '/api/upload',
                 formDataCloud,
                 {
                     headers: {
@@ -68,7 +68,7 @@ export default function CreatePost() {
 
         try {
             const response = await axios.post(
-                'http://localhost:3000/api/upload',
+                '/api/upload',
                 formDataCloud,
                 {
                     headers: {

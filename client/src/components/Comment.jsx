@@ -151,8 +151,14 @@ export default function Comment({ comment, onLike ,onEdit,onDelete}) {
 // Adding PropTypes for validation
 Comment.propTypes = {
   comment: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
     userId: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
+    likes: PropTypes.arrayOf(PropTypes.string).isRequired,
+    numberOfLikes: PropTypes.number.isRequired,
   }).isRequired,
+  onLike: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };

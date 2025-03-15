@@ -28,13 +28,14 @@ export default function Search() {
     const yearFromUrl = urlParams.get('year');
 
     if (searchTermFromUrl || sortFromUrl || categoryFromUrl || yearFromUrl) {
-      setSidebarData({
-        ...sidebarData,
-        searchTerm: searchTermFromUrl,
-        sort: sortFromUrl,
-        category: categoryFromUrl,
-        year: yearFromUrl || '',
-      });
+      // Use functional update to avoid unnecessary re-renders
+      setSidebarData((prevData) => ({
+        ...prevData,
+        searchTerm: searchTermFromUrl || prevData.searchTerm,
+        sort: sortFromUrl || prevData.sort,
+        category: categoryFromUrl || prevData.category,
+        year: yearFromUrl || prevData.year,
+      }));
     }
 
     const fetchPosts = async () => {
@@ -52,20 +53,18 @@ export default function Search() {
         // Filter posts based on visibility rules
         const filteredPosts = data.posts.filter((post) => {
           if (currentUser?.isAdmin) {
-            // Admin can see all posts
-            return true;
-          } else if (post.approved) {
-            // Approved posts are visible to all users
-            return true;
-          } else if (post.userId === currentUser?._id) {
-            // Users can see their own unapproved posts
-            return true;
-          } else if (post.isAdmin) {
-            // Posts created by admin are visible to all users
-            return true;
+            return true; // Admin can see all posts
           }
-          // Denied posts and other users' unapproved posts are not visible
-          return false;
+          if (post.isAdmin) {
+            return true; // Admin posts are visible to everyone
+          }
+          if (post.approved) {
+            return true; // Approved posts are visible to everyone
+          }
+          if (currentUser && post.userId === currentUser._id) {
+            return true; // Users can see their own unapproved posts
+          }
+          return false; // Hide unapproved posts for regular users
         });
 
         setPosts(filteredPosts);
@@ -80,7 +79,7 @@ export default function Search() {
     };
 
     fetchPosts();
-  }, [location.search, currentUser]); // Re-fetch posts when the search query or current user changes
+  }, [location.search, currentUser]); // Add sidebarData to the dependency array
 
   const handleChange = (e) => {
     if (e.target.id === 'searchTerm') {
@@ -127,12 +126,15 @@ export default function Search() {
       // Filter additional posts based on visibility rules
       const filteredPosts = data.posts.filter((post) => {
         if (currentUser?.isAdmin) {
+          return true; // Admin can see all posts
+        }
+        if (post.isAdmin) {
           return true;
-        } else if (post.approved) {
+        }
+        if (post.approved) {
           return true;
-        } else if (post.userId === currentUser?._id) {
-          return true;
-        } else if (post.isAdmin) {
+        }
+        if (currentUser && post.userId === currentUser._id) {
           return true;
         }
         return false;

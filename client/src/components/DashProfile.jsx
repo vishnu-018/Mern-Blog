@@ -57,7 +57,7 @@ export default function DashProfile() {
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/api/upload',
+        '/api/upload',
         formDataCloud,
         {
           headers: {

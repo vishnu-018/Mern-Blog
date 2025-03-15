@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'; // Import PropTypes
 import { Link } from 'react-router-dom';
 
 export default function PostCard({ post }) {
@@ -13,8 +14,8 @@ export default function PostCard({ post }) {
       <div className='p-3 flex flex-col gap-2'>
         <p className='text-lg font-semibold line-clamp-2'>{post.title}</p>
         <span className='italic text-sm'>
-  {Array.isArray(post.category) ? post.category.join(', ') : post.category}
-</span>
+          {Array.isArray(post.category) ? post.category.join(', ') : post.category}
+        </span>
 
         <Link
           to={`/post/${post.slug}`}
@@ -26,3 +27,16 @@ export default function PostCard({ post }) {
     </div>
   );
 }
+
+// Add PropTypes validation
+PostCard.propTypes = {
+  post: PropTypes.shape({
+    slug: PropTypes.string.isRequired, // Validate slug as a required string
+    image: PropTypes.string.isRequired, // Validate image as a required string
+    title: PropTypes.string.isRequired, // Validate title as a required string
+    category: PropTypes.oneOfType([
+      PropTypes.string, // Validate category as a string
+      PropTypes.arrayOf(PropTypes.string), // Validate category as an array of strings
+    ]).isRequired,
+  }).isRequired,
+};
