@@ -27,11 +27,12 @@ app.use(cookieParser());
 app.use(express.json({ limit: "50mb" })); // Increase JSON payload limit
 app.use(express.urlencoded({ limit: "50mb", extended: true })); // Increase form data limit
 app.use(
-    cors({
-      origin: "http://localhost:5173", // Frontend URL
+  cors({
+      origin: ["http://localhost:5173", "https://mern-blog-2-w88t.onrender.com"],
       credentials: true,
-    })
-  );
+  })
+);
+
 
 
 
