@@ -106,6 +106,9 @@ export default function Header() {
             <Link to={"/dashboard?tab=profile"}>
               <Dropdown.Item>Profile</Dropdown.Item>
             </Link>
+            <Link to={"/home"}>
+              <Dropdown.Item>Home</Dropdown.Item>
+            </Link>
             <Dropdown.Divider />
             <Dropdown.Item onClick={handleSignout}>Sign Out</Dropdown.Item>
           </Dropdown>
