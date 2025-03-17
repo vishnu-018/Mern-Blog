@@ -27,6 +27,11 @@ export default function Signup() {
       return setErrorMessage("Please fill out all the fields");
     }
 
+    // Check if the email ends with @bitsathy.ac.in
+    if (!email.endsWith('@bitsathy.ac.in')) {
+      return setErrorMessage("Please provide a valid college email address (@bitsathy.ac.in)");
+    }
+
     if (password !== confirmPassword) {
       return setErrorMessage("Passwords do not match");
     }

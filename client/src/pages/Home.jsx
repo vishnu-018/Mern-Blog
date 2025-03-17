@@ -10,11 +10,10 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
-import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
 
 // Import required modules
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { Autoplay, Navigation } from 'swiper/modules';
 
 export default function Home() {
   const { currentUser } = useSelector((state) => state.user); // Get the current user
@@ -93,6 +92,7 @@ export default function Home() {
    
     'https://www.bitsathy.ac.in/wp-content/uploads/grabbed-5th-Position-at-the-National-level-in-Technoxian-2023-World-Robotics-Competition-7.0.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/vTeam-Agastrix-secured-the-first-prize-earning-a-cash-reward-of-%E2%82%B9-50000-in-SIH-2023.jpg',
+    // Add more image URLs as needed
   ];
 
   useEffect(() => {
@@ -128,13 +128,12 @@ export default function Home() {
       {/* Swiper Slider Section */}
       <div className='relative'>
         <Swiper
-          modules={[Autoplay, Navigation, Pagination]} // Add modules here
+          modules={[Autoplay, Navigation]} // Removed Pagination module
           spaceBetween={0}
           slidesPerView={1}
           loop={true}
           autoplay={{ delay: 3000, disableOnInteraction: false }}
           navigation
-          pagination={{ clickable: true }}
           className='w-full h-[50vh] md:h-[70vh] bg-gray-100' // Responsive height with background color
         >
           {imageUrls.map((url, index) => (
