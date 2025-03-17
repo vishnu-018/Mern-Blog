@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import CommentSection from '../components/CommentSection';
 import PostCard from '../components/PostCard';
+import { useSelector } from 'react-redux';
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -12,6 +13,7 @@ export default function PostPage() {
   const [post, setPost] = useState(null);
   const [recentPosts, setRecentPosts] = useState(null);
   const navigate = useNavigate();
+  const { currentUser } = useSelector((state) => state.user); // Get the current user
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -56,14 +58,27 @@ export default function PostPage() {
         const res = await fetch(`/api/post/getposts?limit=3`);
         const data = await res.json();
         if (res.ok) {
-          setRecentPosts(data.posts);
+          // Apply visibility rules to filter posts
+          const filteredPosts = data.posts.filter((post) => {
+            if (post.isAdmin) {
+              return true; // Admin-created posts are visible to everyone
+            } else if (post.approved) {
+              return true; // Approved posts are visible to everyone
+            } else if (currentUser && post.userId === currentUser._id) {
+              return true; // Users can see their own unapproved posts
+            }
+            return false; // Hide other unapproved posts
+          });
+
+          setRecentPosts(filteredPosts);
         }
       } catch (error) {
         console.log(error.message);
       }
     };
+
     fetchRecentPosts();
-  }, []);
+  }, [currentUser]); // Re-fetch posts when the current user changes
 
   if (loading)
     return (
@@ -87,7 +102,7 @@ export default function PostPage() {
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
         {post?.title}
       </h1>
-  
+
       {/* Display Multiple Categories */}
       <div className="flex gap-2 self-center mt-5 flex-wrap">
         {post?.category && post.category.length > 0 ? (
@@ -106,7 +121,7 @@ export default function PostPage() {
           <span className="text-gray-500">No Category Available</span>
         )}
       </div>
-  
+
       {/* Year Navigation */}
       <Button
         color="gray"
@@ -117,45 +132,59 @@ export default function PostPage() {
       >
         {post?.year}
       </Button>
-  
+
       {/* Display Image */}
       {post?.image && (
-        <img
-          src={post.image}
-          alt={post.title}
-         className="mt-10 p-3 w-full h-[600px] object-contain"
-        />
-      )}
-  
+  <div className="mt-10 p-3 w-full max-w-4xl mx-auto">
+    <div className="relative aspect-[16/9] w-full group">
+      <img
+        src={post.image}
+        alt={post.title}
+        className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
+        loading="lazy"
+      />
+    </div>
+    {post.imageCaption && (
+      <p className="text-sm text-gray-600 text-center mt-2">
+        {post.imageCaption}
+      </p>
+    )}
+  </div>
+)}
+
       {/* Display Video */}
       {post?.video && (
-        <video
-          controls
-           className="mt-10 p-3 w-full h-[800px] object-contain"
-        >
-          <source src={post.video} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      )}
-  
+  <div className="mt-10 p-3 w-full max-w-4xl mx-auto">
+    <div className="relative aspect-video w-full"> {/* 16:9 aspect ratio container */}
+      <video
+        controls
+        className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
+      >
+        <source src={post.video} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+)}
+
       <div className="flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-xs">
         <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
         <span className="italic">
           {post && (post.content.length / 1000).toFixed(0)} mins read
         </span>
       </div>
-  
+
       <div
         className="p-3 max-w-2xl mx-auto w-full post-content"
         dangerouslySetInnerHTML={{ __html: post?.content }}
       ></div>
-  
+
       <div className="max-w-4xl mx-auto w-full">
         <CallToAction />
       </div>
-  
+
       <CommentSection postId={post?._id} />
-  
+
       <div className="flex flex-col justify-center items-center mb-5">
         <h1 className="text-xl mt-5">Recent articles</h1>
         <div className="flex flex-wrap gap-5 mt-5 justify-center">
