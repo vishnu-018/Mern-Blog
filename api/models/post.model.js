@@ -48,6 +48,11 @@ const postSchema = new mongoose.Schema(
       enum: ['admin', 'owner', 'all'], // Define who can see the post
       default: 'owner', // Default to 'owner' for user-created posts
     },
+    status: {
+      type: String,
+      enum: ['Pending', 'Approved', 'Rejected'],
+      default: 'Pending',
+    },
   },
   { timestamps: true }
 );

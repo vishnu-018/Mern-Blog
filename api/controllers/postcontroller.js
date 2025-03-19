@@ -22,7 +22,8 @@ export const create = async (req, res, next) => {
       ? req.body.categories 
       : ['uncategorized'], 
       video: req.body.video || '', 
-      isAdmin: req.user.isAdmin === true ? true : false
+      isAdmin: req.user.isAdmin === true ? true : false,
+      status: 'Pending', // Add the status field with default value 'Pending'
   });
 
   try {
@@ -218,6 +219,7 @@ export const approvePost = async (req, res, next) => {
     // Update the post's approval status
     post.approved = true;
     post.visibleTo = 'all';
+    post.status = 'Approved'; // Set status to "Approved"
     await post.save();
 
     res.status(200).json({ message: 'Post approved successfully', post });
@@ -237,6 +239,7 @@ export const denyPost = async (req, res, next) => {
     // Update the post's approval status
     post.approved = false;
     post.visibleTo = 'admin';
+    post.status = 'Rejected'; // Set status to "Rejected"
     await post.save();
 
     res.status(200).json({ message: 'Post denied successfully', post });

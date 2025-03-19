@@ -78,6 +78,44 @@ export default function DashPosts() {
     }
   };
 
+  const handleApprovePost = async (postId) => {
+    try {
+      const res = await fetch(`/api/post/approve-post/${postId}`, {
+        method: 'PUT',
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) =>
+          prev.map((post) =>
+            post._id === postId ? { ...post, status: 'Approved' } : post
+          )
+        );
+        console.log('Post approved successfully:', data);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleDenyPost = async (postId) => {
+    try {
+      const res = await fetch(`/api/post/deny-post/${postId}`, {
+        method: 'PUT',
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) =>
+          prev.map((post) =>
+            post._id === postId ? { ...post, status: 'Rejected' } : post
+          )
+        );
+        console.log('Post denied successfully:', data);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col w-full">
       <div className="flex-grow overflow-y-auto overflow-x-auto md:mx-auto p-3 scrollbar scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500 w-full">
@@ -98,6 +136,9 @@ export default function DashPosts() {
                     </Table.HeadCell>
                     <Table.HeadCell className="py-4 text-left pl-4 w-1/6">
                       CATEGORY
+                    </Table.HeadCell>
+                    <Table.HeadCell className="py-4 text-center w-1/6">
+                      APPROVAL STATUS
                     </Table.HeadCell>
                     <Table.HeadCell className="py-4 text-left pl-4 w-1/6">
                       DELETE
@@ -134,6 +175,33 @@ export default function DashPosts() {
                         </Table.Cell>
                         <Table.Cell className="py-4 w-1/6">
                           {Array.isArray(post.category) ? post.category.join(', ') : post.category}
+                        </Table.Cell>
+                        <Table.Cell className="py-4 w-1/6 text-center">
+                          {post.status === 'Approved' ? (
+                            <span className="text-green-500">Approved</span>
+                          ) : post.status === 'Rejected' ? (
+                            <span className="text-red-500">Rejected</span>
+                          ) : (
+                            <span className="text-yellow-500">Pending</span>
+                          )}
+                          {currentUser.isAdmin && post.status === 'Pending' && (
+                            <div className="flex gap-2 mt-2 justify-center">
+                              <Button
+                                size="xs"
+                                color="success"
+                                onClick={() => handleApprovePost(post._id)}
+                              >
+                                Approve
+                              </Button>
+                              <Button
+                                size="xs"
+                                color="failure"
+                                onClick={() => handleDenyPost(post._id)}
+                              >
+                                Deny
+                              </Button>
+                            </div>
+                          )}
                         </Table.Cell>
                         <Table.Cell className="py-4 w-1/6">
                           <span
