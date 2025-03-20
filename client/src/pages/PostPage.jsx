@@ -55,7 +55,7 @@ export default function PostPage() {
   useEffect(() => {
     const fetchRecentPosts = async () => {
       try {
-        const res = await fetch(`/api/post/getposts?limit=3`);
+        const res = await fetch(`/api/post/getposts?limit=10`); // Fetch more posts initially
         const data = await res.json();
         if (res.ok) {
           // Apply visibility rules to filter posts
@@ -64,13 +64,12 @@ export default function PostPage() {
               return true; // Admin-created posts are visible to everyone
             } else if (post.approved) {
               return true; // Approved posts are visible to everyone
-            } else if (currentUser && post.userId === currentUser._id) {
-              return true; // Users can see their own unapproved posts
             }
             return false; // Hide other unapproved posts
           });
 
-          setRecentPosts(filteredPosts);
+          // Slice the filtered posts to ensure only 3 are displayed
+          setRecentPosts(filteredPosts.slice(0, 3));
         }
       } catch (error) {
         console.log(error.message);
@@ -135,37 +134,37 @@ export default function PostPage() {
 
       {/* Display Image */}
       {post?.image && (
-  <div className="mt-10 p-3 w-full max-w-4xl mx-auto">
-    <div className="relative aspect-[16/9] w-full group">
-      <img
-        src={post.image}
-        alt={post.title}
-        className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
-        loading="lazy"
-      />
-    </div>
-    {post.imageCaption && (
-      <p className="text-sm text-gray-600 text-center mt-2">
-        {post.imageCaption}
-      </p>
-    )}
-  </div>
-)}
+        <div className="mt-10 p-3 w-full max-w-4xl mx-auto">
+          <div className="relative aspect-[16/9] w-full group">
+            <img
+              src={post.image}
+              alt={post.title}
+              className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+            />
+          </div>
+          {post.imageCaption && (
+            <p className="text-sm text-gray-600 text-center mt-2">
+              {post.imageCaption}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Display Video */}
       {post?.video && (
-  <div className="mt-10 p-3 w-full max-w-4xl mx-auto">
-    <div className="relative aspect-video w-full"> {/* 16:9 aspect ratio container */}
-      <video
-        controls
-        className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
-      >
-        <source src={post.video} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-    </div>
-  </div>
-)}
+        <div className="mt-10 p-3 w-full max-w-4xl mx-auto">
+          <div className="relative aspect-video w-full">
+            <video
+              controls
+              className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
+            >
+              <source src={post.video} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      )}
 
       <div className="flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-xs">
         <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>

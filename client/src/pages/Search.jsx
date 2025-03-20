@@ -61,9 +61,6 @@ export default function Search() {
           if (post.approved) {
             return true; // Approved posts are visible to everyone
           }
-          if (currentUser && post.userId === currentUser._id) {
-            return true; // Users can see their own unapproved posts
-          }
           return false; // Hide unapproved posts for regular users
         });
 
@@ -129,15 +126,12 @@ export default function Search() {
           return true; // Admin can see all posts
         }
         if (post.isAdmin) {
-          return true;
+          return true; // Admin posts are visible to everyone
         }
         if (post.approved) {
-          return true;
+          return true; // Approved posts are visible to everyone
         }
-        if (currentUser && post.userId === currentUser._id) {
-          return true;
-        }
-        return false;
+        return false; // Hide unapproved posts for regular users
       });
 
       setPosts([...posts, ...filteredPosts]);

@@ -107,8 +107,7 @@ export default function Home() {
               return true; // Admin-created posts are visible to everyone
             } else if (post.approved) {
               return true; // Approved posts are visible to everyone
-            } else if (currentUser && post.userId === currentUser._id) {
-              return true; // Users can see their own unapproved posts
+           
             }
             return false; // Hide other unapproved posts
           });

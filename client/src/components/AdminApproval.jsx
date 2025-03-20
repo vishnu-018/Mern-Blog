@@ -81,14 +81,15 @@ export default function AdminApproval() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ approved: true }),
       });
       const data = await res.json();
       if (res.ok) {
-        // Update the post's approval status in the UI
+        // Toggle between "Approved" and "Approve"
         setUserPosts((prev) =>
           prev.map((post) =>
-            post._id === postId ? { ...post, approved: true } : post
+            post._id === postId
+              ? { ...post, status: post.status === 'Approved' ? 'Pending' : 'Approved' }
+              : post
           )
         );
       } else {
@@ -106,12 +107,17 @@ export default function AdminApproval() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ approved: false }),
       });
       const data = await res.json();
       if (res.ok) {
-        // Remove the denied post from the UI
-        setUserPosts((prev) => prev.filter((post) => post._id !== postId));
+        // Toggle between "Rejected" and "Reject"
+        setUserPosts((prev) =>
+          prev.map((post) =>
+            post._id === postId
+              ? { ...post, status: post.status === 'Rejected' ? 'Pending' : 'Rejected' }
+              : post
+          )
+        );
       } else {
         console.log(data.message);
       }
@@ -132,7 +138,7 @@ export default function AdminApproval() {
                 <Table.HeadCell className="py-4 text-center">POST TITLE</Table.HeadCell>
                 <Table.HeadCell className="py-4 text-center">CATEGORY</Table.HeadCell>
                 <Table.HeadCell className="py-4 text-center">APPROVE</Table.HeadCell>
-                <Table.HeadCell className="py-4 text-center">DENY</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-center">REJECT</Table.HeadCell>
                 <Table.HeadCell className="py-4 text-center">DELETE</Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
@@ -156,19 +162,26 @@ export default function AdminApproval() {
                     </Table.Cell>
                     <Table.Cell className="py-4 text-center">
                       <Button
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+                        className={`${
+                          post.status === 'Approved'
+                            ? 'bg-green-500 hover:bg-green-600'
+                            : 'bg-blue-500 hover:bg-blue-600'
+                        } text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105`}
                         onClick={() => handleApprovePost(post._id)}
-                        disabled={post.approved}
                       >
-                        {post.approved ? 'Approved' : 'Approve'}
+                        {post.status === 'Approved' ? 'Approved' : 'Approve'}
                       </Button>
                     </Table.Cell>
                     <Table.Cell className="py-4 text-center">
                       <Button
-                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                        className={`${
+                          post.status === 'Rejected'
+                            ? 'bg-red-500 hover:bg-red-600'
+                            : 'bg-blue-500 hover:bg-blue-600'
+                        } text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105`}
                         onClick={() => handleDenyPost(post._id)}
                       >
-                        Deny
+                        {post.status === 'Rejected' ? 'Rejected' : 'Reject'}
                       </Button>
                     </Table.Cell>
                     <Table.Cell className="py-4 text-center">
