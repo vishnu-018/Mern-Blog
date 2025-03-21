@@ -53,6 +53,7 @@ const postSchema = new mongoose.Schema(
       enum: ['Pending', 'Approved', 'Rejected'],
       default: 'Pending',
     },
+    rejectionReason: { type: String, default: '' }, // Add this field
   },
   { timestamps: true }
 );

@@ -118,24 +118,32 @@ export const updatepost = async (req, res, next) => {
       return next(errorHandler(404, 'Post not found'));
     }
 
+    // Check if the user is authorized to update the post
     if (!req.user.isAdmin && post.userId.toString() !== req.user.id) {
       return next(errorHandler(403, 'You are not allowed to update this post'));
     }
 
+    // If the post was previously rejected, reset its status to "Pending" and clear the rejection reason
+    const updateFields = {
+      title: req.body.title,
+      content: req.body.content,
+      category: Array.isArray(req.body.categories) && req.body.categories.length > 0
+        ? req.body.categories.filter(cat => cat) // Remove null values
+        : post.category, // Retain old category if empty
+      image: req.body.image,
+      video: req.body.video || post.video,
+      year: req.body.year,
+    };
+
+    if (post.status === 'Rejected') {
+      updateFields.status = 'Pending'; // Reset status to "Pending"
+      updateFields.rejectionReason = ''; // Clear the rejection reason
+    }
+
+    // Update the post with the new fields
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.postId,
-      {
-        $set: {
-          title: req.body.title,
-          content: req.body.content,
-          category: Array.isArray(req.body.categories) && req.body.categories.length > 0 
-            ? req.body.categories.filter(cat => cat)  // Remove null values
-            : post.category, // Retain old category if empty
-          image: req.body.image,
-          video: req.body.video || post.video,
-          year: req.body.year,
-        },
-      },
+      { $set: updateFields },
       { new: true }
     );
 
@@ -220,6 +228,7 @@ export const approvePost = async (req, res, next) => {
     post.approved = true;
     post.visibleTo = 'all';
     post.status = 'Approved'; // Set status to "Approved"
+    post.rejectionReason = ''; // Clear the rejection reason
     await post.save();
 
     res.status(200).json({ message: 'Post approved successfully', post });
@@ -240,6 +249,7 @@ export const denyPost = async (req, res, next) => {
     post.approved = false;
     post.visibleTo = 'admin';
     post.status = 'Rejected'; // Set status to "Rejected"
+    post.rejectionReason = req.body.rejectionReason; // Store the rejection reason
     await post.save();
 
     res.status(200).json({ message: 'Post denied successfully', post });

@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Button, Modal, Table } from 'flowbite-react';
+import { Button, Modal, Table, Textarea } from 'flowbite-react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 export default function AdminApproval() {
   const { currentUser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]); // Posts created by users (non-admins)
   const [showMore, setShowMore] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [postIdToDelete, setPostIdToDelete] = useState('');
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [postIdToReject, setPostIdToReject] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
 
+  // Fetch posts created by users (non-admins)
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -34,6 +36,7 @@ export default function AdminApproval() {
     }
   }, [currentUser]);
 
+  // Handle "Show More" button
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
     try {
@@ -52,28 +55,7 @@ export default function AdminApproval() {
     }
   };
 
-  const handleDeletePost = async () => {
-    setShowModal(false);
-    try {
-      const res = await fetch(
-        `/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
-        {
-          method: 'DELETE',
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        console.log(data.message);
-      } else {
-        setUserPosts((prev) =>
-          prev.filter((post) => post._id !== postIdToDelete)
-        );
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
+  // Handle post approval
   const handleApprovePost = async (postId) => {
     try {
       const res = await fetch(`/api/post/approvePost/${postId}`, {
@@ -84,12 +66,10 @@ export default function AdminApproval() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Toggle between "Approved" and "Approve"
+        // Update the post status to "Approved"
         setUserPosts((prev) =>
           prev.map((post) =>
-            post._id === postId
-              ? { ...post, status: post.status === 'Approved' ? 'Pending' : 'Approved' }
-              : post
+            post._id === postId ? { ...post, status: 'Approved', rejectionReason: '' } : post
           )
         );
       } else {
@@ -100,24 +80,28 @@ export default function AdminApproval() {
     }
   };
 
-  const handleDenyPost = async (postId) => {
+  // Handle post rejection with a reason
+  const handleRejectPost = async () => {
+    setShowRejectModal(false);
     try {
-      const res = await fetch(`/api/post/denyPost/${postId}`, {
+      const res = await fetch(`/api/post/denyPost/${postIdToReject}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ rejectionReason }),
       });
       const data = await res.json();
       if (res.ok) {
-        // Toggle between "Rejected" and "Reject"
+        // Update the post status to "Rejected" and store the rejection reason
         setUserPosts((prev) =>
           prev.map((post) =>
-            post._id === postId
-              ? { ...post, status: post.status === 'Rejected' ? 'Pending' : 'Rejected' }
+            post._id === postIdToReject
+              ? { ...post, status: 'Rejected', rejectionReason }
               : post
           )
         );
+        setRejectionReason(''); // Clear the rejection reason
       } else {
         console.log(data.message);
       }
@@ -139,7 +123,7 @@ export default function AdminApproval() {
                 <Table.HeadCell className="py-4 text-center">CATEGORY</Table.HeadCell>
                 <Table.HeadCell className="py-4 text-center">APPROVE</Table.HeadCell>
                 <Table.HeadCell className="py-4 text-center">REJECT</Table.HeadCell>
-                <Table.HeadCell className="py-4 text-center">DELETE</Table.HeadCell>
+                <Table.HeadCell className="py-4 text-center">REJECTION REASON</Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
                 {userPosts.map((post) => (
@@ -179,21 +163,16 @@ export default function AdminApproval() {
                             ? 'bg-red-500 hover:bg-red-600'
                             : 'bg-blue-500 hover:bg-blue-600'
                         } text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105`}
-                        onClick={() => handleDenyPost(post._id)}
+                        onClick={() => {
+                          setPostIdToReject(post._id);
+                          setShowRejectModal(true);
+                        }}
                       >
                         {post.status === 'Rejected' ? 'Rejected' : 'Reject'}
                       </Button>
                     </Table.Cell>
                     <Table.Cell className="py-4 text-center">
-                      <span
-                        onClick={() => {
-                          setShowModal(true);
-                          setPostIdToDelete(post._id);
-                        }}
-                        className="font-medium text-red-600 hover:underline cursor-pointer"
-                      >
-                        Delete
-                      </span>
+                      {post.rejectionReason || 'N/A'}
                     </Table.Cell>
                   </Table.Row>
                 ))}
@@ -213,31 +192,43 @@ export default function AdminApproval() {
           <p>No posts pending approval.</p>
         )}
 
-        <Modal show={showModal} onClose={() => setShowModal(false)} popup size="md" className="flex items-center justify-center min-h-screen">
-          <Modal.Header />
-          <Modal.Body>
-            <div className="text-center">
-              <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
-              <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
-                Are you sure you want to delete this post?
-              </h3>
-              <div className="flex justify-center gap-4">
-                <Button
-                  className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                  onClick={handleDeletePost}
-                >
-                  Yes, I am sure
-                </Button>
-                <Button
-                  className="bg-gray-300 text-gray-700 hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                  onClick={() => setShowModal(false)}
-                >
-                  No, cancel
-                </Button>
-              </div>
-            </div>
-          </Modal.Body>
-        </Modal>
+        {/* Reject Modal */}
+        <Modal show={showRejectModal} onClose={() => setShowRejectModal(false)} popup size="md">
+  <Modal.Header className="border-b border-gray-200 dark:border-gray-700 p-4">
+    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+      Reject Post
+    </h3>
+  </Modal.Header>
+  <Modal.Body className="p-6">
+    <div className="text-center">
+      <HiOutlineExclamationCircle className="h-16 w-16 text-gray-400 dark:text-gray-200 mx-auto mb-4" />
+      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+        Enter the reason for rejection:
+      </h3>
+      <Textarea
+        value={rejectionReason}
+        onChange={(e) => setRejectionReason(e.target.value)}
+        placeholder="Reason for rejection..."
+        className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-700 dark:text-white"
+        rows={4}
+      />
+    </div>
+  </Modal.Body>
+  <Modal.Footer className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
+    <Button
+      className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105"
+      onClick={handleRejectPost}
+    >
+      Reject
+    </Button>
+    <Button
+      className="bg-gray-300 hover:bg-gray-400 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105"
+      onClick={() => setShowRejectModal(false)}
+    >
+      Cancel
+    </Button>
+  </Modal.Footer>
+</Modal>
       </div>
     </div>
   );

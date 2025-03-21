@@ -11,6 +11,7 @@ export default function DashPosts() {
   const [showModal, setShowModal] = useState(false);
   const [postIdToDelete, setPostIdToDelete] = useState('');
 
+  // Fetch posts
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -36,6 +37,7 @@ export default function DashPosts() {
     }
   }, [currentUser]);
 
+  // Handle "Show More" button
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
     try {
@@ -56,6 +58,7 @@ export default function DashPosts() {
     }
   };
 
+  // Handle post deletion
   const handleDeletePost = async () => {
     setShowModal(false);
     try {
@@ -78,10 +81,14 @@ export default function DashPosts() {
     }
   };
 
+  // Handle post approval
   const handleApprovePost = async (postId) => {
     try {
-      const res = await fetch(`/api/post/approve-post/${postId}`, {
+      const res = await fetch(`/api/post/approvePost/${postId}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       const data = await res.json();
       if (res.ok) {
@@ -97,10 +104,14 @@ export default function DashPosts() {
     }
   };
 
+  // Handle post rejection
   const handleDenyPost = async (postId) => {
     try {
-      const res = await fetch(`/api/post/deny-post/${postId}`, {
+      const res = await fetch(`/api/post/denyPost/${postId}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       const data = await res.json();
       if (res.ok) {
@@ -139,6 +150,9 @@ export default function DashPosts() {
                     </Table.HeadCell>
                     <Table.HeadCell className="py-4 text-center w-1/6">
                       APPROVAL STATUS
+                    </Table.HeadCell>
+                    <Table.HeadCell className="py-4 text-center w-1/6">
+                      REJECTION REASON
                     </Table.HeadCell>
                     <Table.HeadCell className="py-4 text-left pl-4 w-1/6">
                       DELETE
@@ -198,10 +212,13 @@ export default function DashPosts() {
                                 color="failure"
                                 onClick={() => handleDenyPost(post._id)}
                               >
-                                Deny
+                                Reject
                               </Button>
                             </div>
                           )}
+                        </Table.Cell>
+                        <Table.Cell className="py-4 w-1/6 text-center">
+                          {post.rejectionReason || 'N/A'}
                         </Table.Cell>
                         <Table.Cell className="py-4 w-1/6">
                           <span
@@ -242,6 +259,7 @@ export default function DashPosts() {
           <p>{currentUser.isAdmin ? 'No posts available' : 'You have no posts yet!'}</p>
         )}
 
+        {/* Delete Modal */}
         <Modal
           show={showModal}
           onClose={() => setShowModal(false)}
