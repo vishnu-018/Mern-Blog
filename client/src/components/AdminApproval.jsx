@@ -146,11 +146,12 @@ export default function AdminApproval() {
                     </Table.Cell>
                     <Table.Cell className="py-4 text-center">
                       <Button
+                        size="md" // Smaller button size
                         className={`${
                           post.status === 'Approved'
                             ? 'bg-green-500 hover:bg-green-600'
                             : 'bg-blue-500 hover:bg-blue-600'
-                        } text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105`}
+                        } text-white font-medium rounded-md shadow-sm transition-all duration-150`}
                         onClick={() => handleApprovePost(post._id)}
                       >
                         {post.status === 'Approved' ? 'Approved' : 'Approve'}
@@ -158,11 +159,12 @@ export default function AdminApproval() {
                     </Table.Cell>
                     <Table.Cell className="py-4 text-center">
                       <Button
+                        size="md" // Smaller button size
                         className={`${
                           post.status === 'Rejected'
                             ? 'bg-red-500 hover:bg-red-600'
                             : 'bg-blue-500 hover:bg-blue-600'
-                        } text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105`}
+                        } text-white font-medium rounded-md shadow-sm transition-all duration-150`}
                         onClick={() => {
                           setPostIdToReject(post._id);
                           setShowRejectModal(true);
@@ -182,7 +184,7 @@ export default function AdminApproval() {
             {showMore && (
               <button
                 onClick={handleShowMore}
-                className="w-full text-teal-500 self-center text-sm py-7"
+                className="w-full text-teal-500 self-center text-sm py-7 hover:text-teal-600 transition-all duration-150"
               >
                 Show more
               </button>
@@ -194,41 +196,43 @@ export default function AdminApproval() {
 
         {/* Reject Modal */}
         <Modal show={showRejectModal} onClose={() => setShowRejectModal(false)} popup size="md">
-  <Modal.Header className="border-b border-gray-200 dark:border-gray-700 p-4">
-    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-      Reject Post
-    </h3>
-  </Modal.Header>
-  <Modal.Body className="p-6">
-    <div className="text-center">
-      <HiOutlineExclamationCircle className="h-16 w-16 text-gray-400 dark:text-gray-200 mx-auto mb-4" />
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-        Enter the reason for rejection:
-      </h3>
-      <Textarea
-        value={rejectionReason}
-        onChange={(e) => setRejectionReason(e.target.value)}
-        placeholder="Reason for rejection..."
-        className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-700 dark:text-white"
-        rows={4}
-      />
-    </div>
-  </Modal.Body>
-  <Modal.Footer className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
-    <Button
-      className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105"
-      onClick={handleRejectPost}
-    >
-      Reject
-    </Button>
-    <Button
-      className="bg-gray-300 hover:bg-gray-400 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105"
-      onClick={() => setShowRejectModal(false)}
-    >
-      Cancel
-    </Button>
-  </Modal.Footer>
-</Modal>
+          <Modal.Header className="border-b border-gray-200 dark:border-gray-700 p-4">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Reject Post
+            </h3>
+          </Modal.Header>
+          <Modal.Body className="p-6">
+            <div className="text-center">
+              <HiOutlineExclamationCircle className="h-16 w-16 text-gray-400 dark:text-gray-200 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                Enter the reason for rejection:
+              </h3>
+              <Textarea
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Reason for rejection..."
+                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-700 dark:text-white"
+                rows={4}
+              />
+            </div>
+          </Modal.Body>
+          <Modal.Footer className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              size="md" // Smaller button size
+              className="bg-red-500 hover:bg-red-600 text-white font-medium rounded-md shadow-sm transition-all duration-150"
+              onClick={handleRejectPost}
+            >
+              Reject
+            </Button>
+            <Button
+              size="md" // Smaller button size
+              className="bg-gray-300 hover:bg-gray-400 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white font-medium rounded-md shadow-sm transition-all duration-150"
+              onClick={() => setShowRejectModal(false)}
+            >
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </div>
   );

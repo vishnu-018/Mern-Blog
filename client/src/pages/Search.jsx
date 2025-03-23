@@ -52,9 +52,7 @@ export default function Search() {
 
         // Filter posts based on visibility rules
         const filteredPosts = data.posts.filter((post) => {
-          if (currentUser?.isAdmin) {
-            return true; // Admin can see all posts
-          }
+         
           if (post.isAdmin) {
             return true; // Admin posts are visible to everyone
           }
