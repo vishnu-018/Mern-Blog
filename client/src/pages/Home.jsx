@@ -98,29 +98,23 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('/api/post/getPosts');
+        const res = await fetch('/api/post/getPosts?limit=12'); // Request more posts initially
         const data = await res.json();
         if (res.ok) {
           // Filter posts based on visibility rules
           const filteredPosts = data.posts.filter((post) => {
-            if (post.isAdmin) {
-              return true; // Admin-created posts are visible to everyone
-            } else if (post.approved) {
-              return true; // Approved posts are visible to everyone
-           
-            }
-            return false; // Hide other unapproved posts
+            return post.isAdmin || post.approved; // Show only admin posts or approved posts
           });
-
+  
           setPosts(filteredPosts);
         }
       } catch (error) {
         console.log(error.message);
       }
     };
-
+  
     fetchPosts();
-  }, [currentUser]); // Re-fetch posts when the current user changes
+  }, [currentUser]);
 
   return (
     <div>
