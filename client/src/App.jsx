@@ -22,8 +22,8 @@ const App = () => {
       <ScrollToTop />
       {!hideHeader && <Header />}
       <Routes>
-        {/* Redirect root URL to /sign-up */}
-        <Route path='/' element={<Navigate to="/sign-up" replace />} />
+        {/* Redirect root URL to home */}
+        <Route path='/' element={<Navigate to="/home" replace />} />
         <Route path='/home' element={<Home />} />
         <Route path='/about' element={<About />} />
         <Route path='/sign-in' element={<Signin />} />
@@ -31,9 +31,9 @@ const App = () => {
         <Route path='/search' element={<Search />} />
         <Route element={<PrivateRoute />}>
           <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/create-post' element={<Createpost />} />
+          <Route path='/update-post/:postId' element={<UpdatePost />} />
         </Route>
-        <Route path='/create-post' element={<Createpost />} />
-        <Route path='/update-post/:postId' element={<UpdatePost />} />
         <Route path='/projects' element={<Projects />} />
         <Route path='/post/:postSlug' element={<PostPage />} />
       </Routes>
