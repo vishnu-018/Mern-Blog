@@ -53,7 +53,7 @@ export default function SignIn() {
             className="w-40 h-40 mb-4" // Increased size to 160px
           />
           {/* BIT Blog Text */}
-          <Link to="/" className="font-bold dark:text-white text-3xl"> {/* Reduced text size */}
+          <Link className="font-bold dark:text-white text-3xl"> {/* Reduced text size */}
             <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-md text-white ml-5">
               BIT
             </span>
