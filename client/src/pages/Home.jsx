@@ -129,20 +129,7 @@ export default function Home() {
         </Swiper>
       </div>
 
-      <div className='max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7'>
-        <div className='bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg p-8 text-center text-white shadow-lg'>
-          <h2 className='text-3xl font-bold mb-4'>Share Your Achievements</h2>
-          <p className='text-lg mb-6'>
-            Inspire others by sharing your projects, certifications, and innovations.
-          </p>
-          <Link
-            to='/create-post'
-            className='inline-block px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-all'
-          >
-            Create a Post
-          </Link>
-        </div>
-      </div>
+     
 
       {/* Main content with sidebar */}
       <div className="flex flex-col md:flex-row max-w-6xl mx-auto">
