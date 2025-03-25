@@ -34,56 +34,7 @@ export default function Home() {
     'https://www.bitsathy.ac.in/wp-content/uploads/abhyjit-bronze-medal.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/SHAASTRA-2025-IIT-Madras.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/SIH.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/605-IIT-BOMBAY.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/615-Micro-Mouse-Maze-01.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/667-Water-Conclave.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/730-BioMed-Bharat-Hackathon.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/933-BRICS-05-scaled.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/933-BRICS-06-scaled.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/1006-H-Baja.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/1077-Himashield-Event.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Achievement-Grabbed-2nd-Prize-with-a-Cash-Reward-of-%E2%82%B915000-in-MythoNova-IIIT-48-Hours-Hackathon.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Achievement-Grabbed-3rd-Prize-with-a-Cash-Reward-of-%E2%82%B91-Lakh-in-TECHNEXT-EXPO-2024.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Achievement-Secured-3rd-and-4th-place-in-Seismic-and-won-the-overall-trophy-for-Best-Performing-College-in-Aakaar-16th-Edition.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Achievement-Won-1st-Prize-with-a-Cash-Prize-of-%E2%82%B930000-in-Anveshana.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Achievement-Won-Cash-Prize-of-%E2%82%B91-Lakh-in-BioMed-Bharat.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/BAGGED-RS.-3-LAKH-IN-DRDO-DARE-TO-DREAM-2.0-CONTEST.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/BIT-team-wins-first-place-I-in-HACK4PURPOSE.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Dot-Robotics.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Grabbed-1st-Prize-with-a-Cash-Reward-of-%E2%82%B91-Lakh-in-TANCAM.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-ADCx-India-2025.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-BRICS2024-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-H-Baja-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Himashield-Event-2025.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-IIT-Madras-Pravartak-EIR-Grant.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/1st-Prize-in-Dare-to-Dream-3.0-Innovation-Contest-%E2%80%93-DRDO.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/2nd-Place-in-Devbhoomi-Cyber-Hackathon-Sponsored-by-the-Government-of-India.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-IndiaSkills-2024.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Ninjacart-Hackathon-2024.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-SIH2024-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-SIH2024-2.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-SIH2024-3.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Shaastra-2025-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Shaastra-2025-2.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Singapore-Autonomous-Underwater-Vehicle-Challenge-2024.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Startup-Mela-6.0.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Technoxian-2024.jpg',
    
-    'https://www.bitsathy.ac.in/wp-content/uploads/Tata-Technologies-InnoVent-InFocas.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Team-AI-evAnGelIst-emerged-as-the-winner-securing-the-first-prize-with-a-cash-reward-of-%E2%82%B9-1-lakh-in-SIH-2023-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Team-House-Stark-Winterfell-attained-the-top-position-capturing-the-first-prize-with-a-cash-award-of-%E2%82%B9-1-lakh-in-SIH-2023-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Team-Spartans-clinched-the-top-prize-receiving-a-cash-award-of-%E2%82%B9-1-lakh-in-SIH-2023-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Team-Tech-Hoppers-triumphed-claiming-the-first-prize-along-with-a-cash-award-of-%E2%82%B9-1-lakh-in-SIH-2023-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Top-Finalist-in-National-Level-Event-Hackademic.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Won-1st-Place-with-a-Cash-Price-of-%E2%82%B9-1-Lakh-in-KAVACH-2023-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Won-1st-Place-with-a-Cash-Prize-of-%E2%82%B9-5-Lakhs-in-Forensic-Hackathon-2023-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Won-1st-Prize-with-a-cash-reward-of-%E2%82%B9100000-in-Hack4Purpose-2024-In-Fous.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Won-Best-Employees-Choice-Award-in-TECHgium-2023-1.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/Won-Runner-Up-with-a-Cash-Price-of-%E2%82%B9-25000-in-Technoxian-2023-World-Robotics-Competition-7.0.jpg',
-   
-   
-    'https://www.bitsathy.ac.in/wp-content/uploads/grabbed-5th-Position-at-the-National-level-in-Technoxian-2023-World-Robotics-Competition-7.0.jpg',
-    'https://www.bitsathy.ac.in/wp-content/uploads/vTeam-Agastrix-secured-the-first-prize-earning-a-cash-reward-of-%E2%82%B9-50000-in-SIH-2023.jpg',
     
   ];
   useEffect(() => {
@@ -108,26 +59,26 @@ export default function Home() {
     <div>
       {/* Full-width sections */}
       <div className='relative'>
-        <Swiper
-          modules={[Autoplay, Navigation]}
-          spaceBetween={0}
-          slidesPerView={1}
-          loop={true}
-          autoplay={{ delay: 3000, disableOnInteraction: false }}
-          navigation
-          className='w-full h-[50vh] md:h-[70vh] bg-gray-100'
-        >
-          {imageUrls.map((url, index) => (
-            <SwiperSlide key={index}>
-              <img
-                src={url}
-                alt={`Slide ${index + 1}`}
-                className='w-full h-full object-contain'
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
+  <Swiper
+    modules={[Autoplay, Navigation]}
+    spaceBetween={0}
+    slidesPerView={1}
+    loop={true}
+    autoplay={{ delay: 3000, disableOnInteraction: false }}
+    navigation
+    className='w-full h-[50vh] md:h-[70vh]' // Removed bg-gray-100
+  >
+    {imageUrls.map((url, index) => (
+      <SwiperSlide key={index} > {/* Added bg-black */}
+        <img
+          src={url}
+          alt={`Slide ${index + 1}`}
+          className='w-full h-full object-contain'
+        />
+      </SwiperSlide>
+    ))}
+  </Swiper>
+</div>
 
      
 
