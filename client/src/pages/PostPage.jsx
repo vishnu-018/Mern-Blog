@@ -1,9 +1,7 @@
 import { Button, Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import CallToAction from '../components/CallToAction';
 import CommentSection from '../components/CommentSection';
-import PostCard from '../components/PostCard';
 import { useSelector } from 'react-redux';
 
 export default function PostPage() {
@@ -11,9 +9,19 @@ export default function PostPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
-  const [recentPosts, setRecentPosts] = useState(null);
+  const [ setRecentPosts] = useState(null); // Added back the variable declaration
   const navigate = useNavigate();
-  const { currentUser } = useSelector((state) => state.user); // Get the current user
+  const { currentUser } = useSelector((state) => state.user);
+
+  const categories = [
+    'Project Innovations',
+    'Certifications',
+    'Academic Excellence',
+    'Competitions',
+    'Product Development',
+    'Patent',
+    'Paper Presentation',
+  ];
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -28,15 +36,11 @@ export default function PostPage() {
           return;
         }
 
-        // Extract post data
         const postData = data.posts[0];
-
         if (postData) {
-          // Ensure category is an array and filter out null/undefined
           postData.category = Array.isArray(postData.category)
-            ? postData.category.filter((cat) => cat) // Remove null/undefined
+            ? postData.category.filter((cat) => cat)
             : [];
-
           setPost(postData);
         }
 
@@ -55,20 +59,14 @@ export default function PostPage() {
   useEffect(() => {
     const fetchRecentPosts = async () => {
       try {
-        const res = await fetch(`/api/post/getposts?limit=10`); // Fetch more posts initially
+        const res = await fetch(`/api/post/getposts?limit=10`);
         const data = await res.json();
         if (res.ok) {
-          // Apply visibility rules to filter posts
           const filteredPosts = data.posts.filter((post) => {
-            if (post.isAdmin) {
-              return true; // Admin-created posts are visible to everyone
-            } else if (post.approved) {
-              return true; // Approved posts are visible to everyone
-            }
-            return false; // Hide other unapproved posts
+            if (post.isAdmin) return true;
+            else if (post.approved) return true;
+            return false;
           });
-
-          // Slice the filtered posts to ensure only 3 are displayed
           setRecentPosts(filteredPosts.slice(0, 3));
         }
       } catch (error) {
@@ -77,7 +75,9 @@ export default function PostPage() {
     };
 
     fetchRecentPosts();
-  }, [currentUser]); // Re-fetch posts when the current user changes
+  }, [currentUser, setRecentPosts]); // Added setRecentPosts to dependency array
+
+  // ... rest of your component remains the same ...
 
   if (loading)
     return (
@@ -93,104 +93,118 @@ export default function PostPage() {
       </div>
     );
 
-  console.log("Post Data:", post);
-  console.log("Post Category:", post?.category);
-
   return (
-    <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
-      <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
-        {post?.title}
-      </h1>
+    <div className="flex flex-col md:flex-row gap-8 p-3 max-w-6xl mx-auto min-h-screen">
+      {/* Main Content (Left Side) */}
+      <main className="flex-1">
+        <h1 className="text-3xl mt-10 p-3 text-center font-serif lg:text-4xl">
+          {post?.title}
+        </h1>
 
-      {/* Display Multiple Categories */}
-      <div className="flex gap-2 self-center mt-5 flex-wrap">
-        {post?.category && post.category.length > 0 ? (
-          post.category.map((cat, index) => (
-            <Button
-              key={index}
-              color="gray"
-              pill
-              size="xs"
-              onClick={() => navigate(`/search?category=${encodeURIComponent(cat)}`)}
-            >
-              {cat}
-            </Button>
-          ))
-        ) : (
-          <span className="text-gray-500">No Category Available</span>
+        {/* Meta Information */}
+        <div className="flex flex-col items-center gap-2 mt-5">
+          {/* Categories */}
+          <div className="flex flex-wrap justify-center gap-2">
+            {post?.category && post.category.length > 0 ? (
+              post.category.map((cat, index) => (
+                <Button
+                  key={index}
+                  color="gray"
+                  pill
+                  size="xs"
+                  onClick={() => navigate(`/search?category=${encodeURIComponent(cat)}`)}
+                >
+                  {cat}
+                </Button>
+              ))
+            ) : (
+              <span className="text-gray-500 text-sm">No categories</span>
+            )}
+          </div>
+
+          {/* Year */}
+          <Button
+            color="gray"
+            pill
+            size="xs"
+            onClick={() => navigate(`/search?year=${post?.year}`)}
+          >
+            {post?.year}
+          </Button>
+        </div>
+
+        {/* Display Image */}
+        {post?.image && (
+          <div className="mt-10 p-3 w-full">
+            <div className="relative aspect-[16/9] w-full group">
+              <img
+                src={post.image}
+                alt={post.title}
+                className="absolute top-0 left-0 w-full h-full object-contain rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+            {post.imageCaption && (
+              <p className="text-sm text-gray-600 text-center mt-2">
+                {post.imageCaption}
+              </p>
+            )}
+          </div>
         )}
-      </div>
 
-      {/* Year Navigation */}
-      <Button
-        color="gray"
-        pill
-        size="xs"
-        className="self-center mt-5"
-        onClick={() => navigate(`/search?year=${post?.year}`)}
-      >
-        {post?.year}
-      </Button>
-
-      {/* Display Image */}
-      {post?.image && (
-        <div className="mt-10 p-3 w-full max-w-4xl mx-auto">
-          <div className="relative aspect-[16/9] w-full group">
-            <img
-              src={post.image}
-              alt={post.title}
-              className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
-              loading="lazy"
-            />
+        {/* Display Video */}
+        {post?.video && (
+          <div className="mt-10 p-3 w-full">
+            <div className="relative aspect-video w-full">
+              <video
+                controls
+                className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
+              >
+                <source src={post.video} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
           </div>
-          {post.imageCaption && (
-            <p className="text-sm text-gray-600 text-center mt-2">
-              {post.imageCaption}
-            </p>
-          )}
-        </div>
-      )}
+        )}
 
-      {/* Display Video */}
-      {post?.video && (
-        <div className="mt-10 p-3 w-full max-w-4xl mx-auto">
-          <div className="relative aspect-video w-full">
-            <video
-              controls
-              className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-lg"
-            >
-              <source src={post.video} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+        <div className="flex justify-between p-3 border-b border-slate-500 w-full text-xs">
+          <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
+          <span className="italic">
+            {post && (post.content.length / 1000).toFixed(0)} mins read
+          </span>
+        </div>
+
+        <div
+          className="p-3 w-full post-content"
+          dangerouslySetInnerHTML={{ __html: post?.content }}
+        ></div>
+
+        
+
+        <CommentSection postId={post?._id} />
+
+       
+      </main>
+
+      {/* Categories Sidebar (Right Side) - Matching Home page style */}
+      <aside className="w-full md:w-1/4 mt-10">
+        <div className="sticky top-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+            <h2 className="text-xl font-semibold mb-4 text-center">Explore by Category</h2>
+            <div className="space-y-2">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => navigate(`/search?category=${encodeURIComponent(category)}`)}
+                  className="block w-full p-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      )}
-
-      <div className="flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-2xl text-xs">
-        <span>{post && new Date(post.createdAt).toLocaleDateString()}</span>
-        <span className="italic">
-          {post && (post.content.length / 1000).toFixed(0)} mins read
-        </span>
-      </div>
-
-      <div
-        className="p-3 max-w-2xl mx-auto w-full post-content"
-        dangerouslySetInnerHTML={{ __html: post?.content }}
-      ></div>
-
-      <div className="max-w-4xl mx-auto w-full">
-        <CallToAction />
-      </div>
-
-      <CommentSection postId={post?._id} />
-
-      <div className="flex flex-col justify-center items-center mb-5">
-        <h1 className="text-xl mt-5">Recent articles</h1>
-        <div className="flex flex-wrap gap-5 mt-5 justify-center">
-          {recentPosts &&
-            recentPosts.map((post) => <PostCard key={post._id} post={post} />)}
-        </div>
-      </div>
-    </main>
+      </aside>
+    </div>
   );
 }

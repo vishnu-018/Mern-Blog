@@ -1,25 +1,17 @@
 import { Link } from 'react-router-dom';
-import CallToAction from '../components/CallToAction';
 import { useEffect, useState } from 'react';
 import PostCard from '../components/PostCard';
 import { useSelector } from 'react-redux';
-
-// Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
-
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
-
-// Import required modules
 import { Autoplay, Navigation } from 'swiper/modules';
 
 export default function Home() {
-  const { currentUser } = useSelector((state) => state.user); // Get the current user
+  const { currentUser } = useSelector((state) => state.user);
   const [posts, setPosts] = useState([]);
 
-  // List of categories
   const categories = [
     'Project Innovations',
     'Certifications',
@@ -30,13 +22,13 @@ export default function Home() {
     'Paper Presentation',
   ];
 
-  // List of image URLs
   const imageUrls = [
     'https://www.bitsathy.ac.in/wp-content/uploads/hack4purpose.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/home-slider-tata-technologies-innovent-2023.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/indiaskilla.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/sauvc_2024.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/brics_2024_3rd_place_with_bronze_medal.jpg',
+
 
     'https://www.bitsathy.ac.in/wp-content/uploads/slider-18-msme.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/abhyjit-bronze-medal.jpg',
@@ -76,7 +68,7 @@ export default function Home() {
     'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Singapore-Autonomous-Underwater-Vehicle-Challenge-2024.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Startup-Mela-6.0.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/In-Focus-Technoxian-2024.jpg',
-    
+   
     'https://www.bitsathy.ac.in/wp-content/uploads/Tata-Technologies-InnoVent-InFocas.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/Team-AI-evAnGelIst-emerged-as-the-winner-securing-the-first-prize-with-a-cash-reward-of-%E2%82%B9-1-lakh-in-SIH-2023-1.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/Team-House-Stark-Winterfell-attained-the-top-position-capturing-the-first-prize-with-a-cash-award-of-%E2%82%B9-1-lakh-in-SIH-2023-1.jpg',
@@ -92,65 +84,56 @@ export default function Home() {
    
     'https://www.bitsathy.ac.in/wp-content/uploads/grabbed-5th-Position-at-the-National-level-in-Technoxian-2023-World-Robotics-Competition-7.0.jpg',
     'https://www.bitsathy.ac.in/wp-content/uploads/vTeam-Agastrix-secured-the-first-prize-earning-a-cash-reward-of-%E2%82%B9-50000-in-SIH-2023.jpg',
-    // Add more image URLs as needed
+    
   ];
-
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('/api/post/getPosts?limit=12'); // Request more posts initially
+        const res = await fetch('/api/post/getPosts?limit=10&approved=true'); // Fetch more initially to ensure we get 10 approved
         const data = await res.json();
         if (res.ok) {
-          // Filter posts based on visibility rules
           const filteredPosts = data.posts.filter((post) => {
-            return post.isAdmin || post.approved; // Show only admin posts or approved posts
-          });
-  
+            return post.isAdmin || post.approved;
+          }).slice(0, 10); // Take first 10 approved/admin posts
           setPosts(filteredPosts);
         }
       } catch (error) {
         console.log(error.message);
       }
     };
-  
     fetchPosts();
   }, [currentUser]);
 
   return (
     <div>
-      {/* Swiper Slider Section */}
+      {/* Full-width sections */}
       <div className='relative'>
         <Swiper
-          modules={[Autoplay, Navigation]} // Removed Pagination module
+          modules={[Autoplay, Navigation]}
           spaceBetween={0}
           slidesPerView={1}
           loop={true}
           autoplay={{ delay: 3000, disableOnInteraction: false }}
           navigation
-          className='w-full h-[50vh] md:h-[70vh] bg-gray-100' // Responsive height with background color
+          className='w-full h-[50vh] md:h-[70vh] bg-gray-100'
         >
           {imageUrls.map((url, index) => (
             <SwiperSlide key={index}>
               <img
                 src={url}
                 alt={`Slide ${index + 1}`}
-                className='w-full h-full object-contain' // Ensure the entire image is visible
+                className='w-full h-full object-contain'
               />
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
 
-      {/* Call to Action Section */}
-      <div className='p-3 bg-amber-100 dark:bg-slate-700'>
-        <CallToAction />
-      </div>
-
       <div className='max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7'>
         <div className='bg-gradient-to-r from-blue-500 to-teal-500 rounded-lg p-8 text-center text-white shadow-lg'>
           <h2 className='text-3xl font-bold mb-4'>Share Your Achievements</h2>
           <p className='text-lg mb-6'>
-            Inspire others by sharing your projects, certifications, and innovations. Let the world know about your success!
+            Inspire others by sharing your projects, certifications, and innovations.
           </p>
           <Link
             to='/create-post'
@@ -161,45 +144,47 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Category Section */}
-      <div className='max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7'>
-        <h2 className='text-2xl font-semibold text-center'>Explore by Category</h2>
-        <div className='flex flex-wrap gap-4 justify-center'>
-          {categories.map((category) => (
-            <div
-              key={category}
-              className='border border-teal-500 rounded-lg p-4 w-full sm:w-[300px] text-center'
-            >
-              <h3 className='text-xl font-semibold'>{category}</h3>
+      {/* Main content with sidebar */}
+      <div className="flex flex-col md:flex-row max-w-6xl mx-auto">
+        {/* Recent Posts Section (Left side) */}
+        <div className="w-full md:w-3/4 p-3">
+          {posts.length > 0 && (
+            <div className='flex flex-col gap-6'>
+              <h2 className='text-2xl font-semibold text-center'>Recent Posts</h2>
+              <div className='flex flex-wrap gap-4'>
+                {posts.slice(0, 10).map((post) => (
+                  <PostCard key={post._id} post={post} />
+                ))}
+              </div>
               <Link
-                to={`/search?category=${encodeURIComponent(category)}`}
-                className='mt-4 inline-block px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all'
+                to={'/search'}
+                className='text-lg text-teal-500 hover:underline text-center'
               >
-                View Posts
+                View all posts
               </Link>
             </div>
-          ))}
+          )}
         </div>
-      </div>
 
-      {/* Recent Posts Section */}
-      <div className='max-w-6xl mx-auto p-3 flex flex-col gap-8 py-7'>
-        {posts.length > 0 && (
-          <div className='flex flex-col gap-6'>
-            <h2 className='text-2xl font-semibold text-center'>Recent Posts</h2>
-            <div className='flex flex-wrap gap-4'>
-              {posts.slice(0, 6).map((post) => (
-                <PostCard key={post._id} post={post} />
-              ))}
+        {/* Categories Sidebar (Right side) - Now appears after Create Post section */}
+        <div className="w-full md:w-1/4 p-4">
+          <div className="sticky top-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+              <h2 className="text-xl font-semibold mb-4 text-center">Explore by Category</h2>
+              <div className="space-y-2">
+                {categories.map((category) => (
+                  <Link
+                    key={category}
+                    to={`/search?category=${encodeURIComponent(category)}`}
+                    className="block p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  >
+                    {category}
+                  </Link>
+                ))}
+              </div>
             </div>
-            <Link
-              to={'/search'}
-              className='text-lg text-teal-500 hover:underline text-center'
-            >
-              View all posts
-            </Link>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

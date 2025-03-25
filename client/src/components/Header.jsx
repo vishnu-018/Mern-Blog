@@ -8,14 +8,14 @@ import { signoutSuccess } from "../redux/user/userSlice";
 import { useEffect, useState } from "react";
 
 export default function Header() {
-  const { pathname, search } = useLocation(); // Get both pathname and search (query parameters)
+  const { pathname, search } = useLocation();
   const location = useLocation();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);
   const { theme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu toggle
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleSignout = async () => {
     try {
@@ -27,15 +27,15 @@ export default function Header() {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());
+        navigate('/sign-in');
       }
     } catch (error) {
       console.log(error.message);
     }
   };
 
-  // Updated isActive function to handle query parameters
   const isActive = (path) => {
-    const currentPath = pathname + search; // Include query parameters
+    const currentPath = pathname + search;
     return currentPath === path;
   };
 
@@ -57,16 +57,13 @@ export default function Header() {
 
   return (
     <Navbar className="border-b-2 flex justify-between items-center bg-white dark:bg-gray-900 relative z-50">
-      {/* Logo */}
-      <Link
-        to="/"
-        className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white"
-      >
+      {/* BIT Blog Name (not a link) */}
+      <div className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white">
         <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
           BIT
         </span>
-        Blog
-      </Link>
+        <span className="ml-1">Blog</span>
+      </div>
 
       {/* Search Bar */}
       <form className="flex items-center gap-2" onSubmit={handleSubmit}>
@@ -124,52 +121,53 @@ export default function Header() {
           </svg>
         </Button>
 
-        {/* Desktop Navigation Links (hidden on mobile) */}
-        <div className="hidden sm:flex gap-4">
-          {["/home", "/about", "/dashboard?tab=profile"].map((path, index) => (
-            <Link
-              key={index}
-              to={path}
-              className={`font-bold hover:underline ${
-                isActive(path) ? "text-blue-500" : "text-gray-900 dark:text-white"
-              }`}
-            >
-              {path === "/home"
-                ? "Home"
-                : path.startsWith("/dashboard")
-                ? "Profile"
-                : path.substring(1).charAt(0).toUpperCase() + path.slice(2)}
-            </Link>
-          ))}
+        {/* Desktop Navigation Links */}
+        <div className="hidden sm:flex items-center gap-4">
+          <Link
+            to="/home"
+            className={`font-bold hover:underline ${
+              isActive("/home") ? "text-blue-500" : "text-gray-900 dark:text-white"
+            }`}
+          >
+            Home
+          </Link>
+          <Link
+            to="/create-post"
+            className={`font-bold hover:underline ${
+              isActive("/create-post") ? "text-blue-500" : "text-gray-900 dark:text-white"
+            }`}
+          >
+            + New post
+          </Link>
         </div>
 
-        {/* Mobile Navigation Menu (hidden by default, shown when toggled) */}
+        {/* Mobile Navigation Menu */}
         <div
           className={`sm:hidden ${
             isMenuOpen ? "block" : "hidden"
           } absolute top-16 right-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 z-50`}
         >
-          {["/home", "/about", "/dashboard?tab=profile"].map((path, index) => (
-            <Link
-              key={index}
-              to={path}
-              className={`block px-4 py-2 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                isActive(path)
-                  ? "text-blue-500"
-                  : "text-gray-900 dark:text-white"
-              }`}
-              onClick={() => setIsMenuOpen(false)} // Close menu when a link is clicked
-            >
-              {path === "/home"
-                ? "Home"
-                : path.startsWith("/dashboard")
-                ? "Profile"
-                : path.substring(1).charAt(0).toUpperCase() + path.slice(2)}
-            </Link>
-          ))}
+          <Link
+            to="/home"
+            className={`block px-4 py-2 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 ${
+              isActive("/home") ? "text-blue-500" : "text-gray-900 dark:text-white"
+            }`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Home
+          </Link>
+          <Link
+            to="/create-post"
+            className={`block px-4 py-2 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 ${
+              isActive("/create-post") ? "text-blue-500" : "text-gray-900 dark:text-white"
+            }`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            + New post
+          </Link>
         </div>
 
-        {/* User Dropdown or Sign In Button */}
+        {/* User Dropdown */}
         {currentUser ? (
           <Dropdown
             label={
@@ -189,11 +187,11 @@ export default function Header() {
                 {currentUser.email}
               </span>
             </Dropdown.Header>
-            <Link to={"/dashboard?tab=profile"}>
-              <Dropdown.Item>Profile</Dropdown.Item>
-            </Link>
             <Link to={"/home"}>
               <Dropdown.Item>Home</Dropdown.Item>
+            </Link>
+            <Link to={"/dashboard?tab=profile"}>
+              <Dropdown.Item>Profile</Dropdown.Item>
             </Link>
             <Dropdown.Divider />
             <Dropdown.Item onClick={handleSignout}>Sign Out</Dropdown.Item>
